@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>详情</title>
+		<link rel="stylesheet" href="../css/reset.css">
+		<link rel="stylesheet" href="../css/moudle.css">
+
+		<script src="../js/rem.js"></script>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 95%;overflow:auto;background-color: #eaeaea;">
+			<div style="background-color: #ffffff;margin-bottom: .2rem;">
+				<div class="inf">
+					<p class="left">学生姓名</p>
+					<p class="right">{{dataList.userName}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">性别</p>
+					<p class="right">{{dataList.sex}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">民族</p>
+					<p class="right">{{dataList.nation}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">身份证号</p>
+					<p class="right">{{dataList.idCard}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">现家庭住址</p>
+					<p class="right">{{dataList.currentAddress}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">户籍所在地</p>
+					<p class="right">{{dataList.domicilePlace}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">监护人姓名</p>
+					<p class="right">{{dataList.guardianName}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">监护人联系电话</p>
+					<p class="right">{{dataList.guardianPhone}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">监护人工作单位</p>
+					<p class="right">{{dataList.guardianCompany}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">学生或监护人户口簿</p>
+					<p class="right"><img style="width: 2rem" :src="'https://www.yjhlcity.com/InfoIssue/route/file/downloadfile/true/'+dataList.photo" alt=""></p>
+				</div>
+				<div class="inf">
+					<p class="left">监护人居住证明</p>
+					<p class="right"><img style="width: 2rem" :src="'https://www.yjhlcity.com/InfoIssue/route/file/downloadfile/true/'+dataList.accessory" alt=""></p>
+				</div>
+				<div class="inf">
+					<p class="left">转学理由</p>
+					<p class="right">{{dataList.transferReason}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">学籍号</p>
+					<p class="right">{{dataList.studentNumber}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">学校</p>
+					<p class="right">{{dataList.schoolName}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">年级</p>
+					<p class="right">{{dataList.grade}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">原就读学校联系电话</p>
+					<p class="right">{{dataList.originalSchoolPhone}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">原就读学校</p>
+					<p class="right">{{dataList.originalSchool}}</p>
+				</div>
+			</div>
+		</div>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vue.js"></script>
+		<script src="../js/layer/layer.js"></script>
+		<script src="../js/layer/ajax.js"></script>
+		<script src="../js/util.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					dataList:[]
+				},
+				created: function(e) {
+					//URL_Request("id");
+					let that = this
+					doGetFormToken(
+							`https://www.yjhlcity.com/InfoIssue/app/transferschool/gettransferschool/${getUrlParam("id")}`,null,
+							getUrlParam("token"),
+							function(code, data) {
+								//console.log(data)
+								that.dataList = data
+
+							},
+							function() {
+
+							});
+				},
+
+
+				
+			});
+		</script>

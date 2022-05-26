@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>新冠疫苗接种预约</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+		<script src="js/rem.js"></script>
+		<script src="js/openjsbridge.icity.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.1/vconsole.min.js"></script>
+		<style>
+			.cm-page-input {
+				background-color: #fff;
+				width: 80%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				margin: -15px auto;
+				display: flex;
+				flex-direction: column;
+				padding: 0.3rem;
+			}
+
+			.cm-page-type {
+				display: flex;
+			}
+
+			.cm-page-type input {
+				width: 100%;
+				height: .78rem;
+				border: 1px solid #EEEEEE;
+				outline: 0;
+				font-size: .3rem;
+				color: #333333;
+				padding: .18rem;
+				box-sizing: border-box;
+				margin-left: 0.2rem;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: auto;
+				margin-top: 0;
+				padding-top: 0;
+				display: flex;
+				align-items: flex-end;
+				/* margin-top: .6rem; */
+			}
+
+			.cm-page-btn button {
+				width: 100%;
+				height: 0.8rem;
+				background: #6670E1;
+				border-radius: 3px;
+				font-size: .3rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .8rem;
+				border: 0;
+				outline: none;
+			}
+
+			.info {
+				display: flex;
+			}
+
+			.info .right {
+				display: flex;
+				align-items: center;
+				height: auto;
+				float: right;
+				padding-right: .3rem;
+				font-size: .3rem;
+				margin: 5px 0;
+				line-height: .45rem;
+				color: #666666;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%; overflow:auto;background-color: white;">
+			<div class="Head" style="z-index: -99;">
+				<img src="./images/yimiaojiezhong.jpg" style="width: 100%;height: 100%;">
+			</div>
+			<div style="background-color: white;width: 100%;margin-bottom: .2rem;padding-bottom: .5rem;">
+				<div class="cm-page-input">
+
+					<div class="cm-page-btn">
+						<button @click="search()">新冠疫苗接种预约</button>
+					</div>
+				</div>
+			</div>
+			<div style="display: flex;margin: 10px;padding-left: 5px;padding-bottom: 10px;">
+				<p style="height: 18px;width: 5px;border-radius: 2px;background-color: #6670E1;margin-right: 5px;"></p>
+				<p style="font-size: 18px;line-height: 18px;font-weight: bold;">接种常识</p>
+			</div>
+			<div v-if="showList.length==0"
+				style="width: 100%;height: auto;margin-top: 50px; display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="images/none.png" />
+			</div>
+
+			<div v-else v-for="(item, index) in showList"
+				style="background-color: #ffffff;padding: 15px 0.3rem;border-bottom: #eaeaea 1px solid;"
+				@click="goInfo(item.infoContentId)">
+				<div class="info">
+					<p class="right">{{item.info_content}}</p>
+				</div>
+				<div class="info">
+					<p class="right">发布日期：{{item.publishdate}}</p>
+				</div>
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .35rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: 0.8rem;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					showList: [],
+					code: '', //授权成功后返回的code
+					name: '', //姓名
+					idCard: '',
+					phone: ''
+				},
+				created: function(e) {
+					this.name = localStorage.getItem('name') == null ? '' : localStorage.getItem('name')
+				},
+				methods: {
+					call(number) {
+						window.location.href = 'tel:' + number;
+					},
+					getInfo: function() {
+						var self = this;
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/infocontent/listUserpageinfocontent?infotypeid=659c74c4-e7f5-42fe-a8e2-2486352e2f70', {},
+							null,
+							function(code, data) {
+								console.log(data)
+								self.showList = data.rows;
+							}, null, null,
+							function() {
+
+							});
+					},
+					goInfo(id) {
+						window.location.href = 'newsInfo.html?id=' + escape(id)
+					},
+					search() {
+						let self=this
+						iCityBridge.openApplet({
+							userName: 'gh_7c24c1a22247', // 小程序原始id，可以从小程序“更多资料”里获取
+							// path: 'pages/index/index', //对应打开页面的路径
+							path: 'pages/index/index?name=' + encodeURIComponent(localStorage.getItem("name")) + '&idcard=' + localStorage.getItem("idCard") + '&phone=' + localStorage.getItem("phone"), //对应打开页面的路径
+							tag: 0,
+						})
+						console.log('pages/index/index?name=' + encodeURIComponent(localStorage.getItem("name")) + '&idcard=' + localStorage.getItem("idCard") + '&phone=' + localStorage.getItem("phone"))
+						
+					},
+					getUserInfo() {
+						doGetForm(
+							'https://app.zwfw.nmg.gov.cn:4443/icity/auth2.0/authorize', {}, null,
+							function(code, data) {
+								console.log(data)
+							}, null, null,
+							function() {
+
+							});
+						var url = encodeURI("https://www.yjhlcity.com/ysb_msbjr/vaccine.html")
+						window.location.href =
+							'https://app.zwfw.nmg.gov.cn:4443/icity/auth2.0/authorize?app_id=45124dc0-a082-4212-92b6-fe6b13c68d24&redirect_uri=' +
+							url + '&scope=auth_user&state=';
+					},
+					getUrlParam: function(name) {
+						var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+						var r = window.location.search.substr(1).match(reg); //匹配目标参数
+						if (r != null) return unescape(r[2]);
+						return null; //返回参数值
+					},
+					getToken() {
+						var self = this;
+						console.log("code" + self.code)
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/mengsuban/getUserInfo/' + self.code, {},
+							null,
+							function(code, data) {
+								console.log(data)
+								localStorage.setItem("name",data.realName)
+								localStorage.setItem("idCard",data.idCard)
+								localStorage.setItem("phone",data.mobilePhone)
+							}, null, null,
+							function() {
+
+							});
+					},
+
+				},
+				created() {
+					var left = this
+					// var vConsole = new VConsole();
+					iCityBridge.init(function(hasLogin) {});
+
+				},
+				mounted() {
+					
+					this.getInfo()
+					this.code = this.getUrlParam("code")
+					console.log("name"+localStorage.getItem("name"))
+					if (this.code == null) {
+						this.getUserInfo()
+					} else {
+						if(localStorage.getItem("name")==null){
+							console.log("获取用户信息")
+							this.getToken()
+						}
+						
+					}
+				}
+			});
+		</script>

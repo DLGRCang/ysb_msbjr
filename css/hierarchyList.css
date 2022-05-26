@@ -1,0 +1,43 @@
+.hierarchyList{
+    font-size: .28rem;
+    padding: 0 .55rem;
+}
+.hierarchyList .list1{
+    display: flex;
+    align-items: self-start;
+    justify-content: space-between;
+    font-weight: bold;
+}
+.hierarchyList .list1 p:first-child{
+    width: .5rem;
+    height: .5rem;
+    background: #2162B5;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.hierarchyList .list1 p:last-child{
+    width: 90%;
+    margin-bottom: .2rem;
+}
+.contentList{
+    font-size: .22rem;
+    padding-left: 10%;
+    margin-bottom: .2rem;
+}
+.hierarchyList .list2{
+    font-size: .26rem;
+    font-weight: 600;
+    margin-bottom: .2rem;
+}
+.hierarchyList .list3{
+    font-size: .24rem;
+    padding-left: 5%;
+    margin-bottom: .2rem;
+}
+.contentListNoLeft{
+    font-size: .22rem;
+    margin-bottom: .15rem;
+}

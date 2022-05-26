@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>一键挪车</title>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.1/vconsole.min.js"></script>
+		<script src="js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/rem.js"></script>
+		<script src="js/util.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" href="css/moudle.css">
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				background-color: #FFFFFF;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				background-color: #FFFFFF;
+				height: 90%;
+				display: flex;
+				flex-direction: column;
+				overflow: auto;
+			}
+
+			.cm-page-input {
+				background-color: #fff;
+				width: 85%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				display: flex;
+				align-items: center;
+				align-self: center;
+				padding: 0.3rem;
+				margin-top: .5rem;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: .7rem;
+				background: #00ae7e;
+				border-radius: 3px;
+				font-size: .28rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .4rem;
+				border: 0;
+				letter-spacing: 1.5px;
+				outline: none;
+			}
+
+			.tag {
+				font-size: .28rem;
+				color: black;
+				font-weight: bold;
+				margin: .8rem .55rem .2rem .55rem;
+			}
+
+			.list {
+				background-color: #eaeaea;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="cm-page-input">
+				<button class="cm-page-btn" @click="goForm()">一键挪车</button>
+			</div>
+			<p class="tag">历史申请</p>
+			<div v-if="dataList.length==0"
+				style="width: 100%;height: auto;margin-top: 100px; display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="images/none.png" />
+			</div>
+			<div v-else class="list">
+				<div v-for="item in dataList" style="background-color: #ffffff;margin-bottom:.1rem;padding: 0 0.3rem;"
+					@click="goInfo(item.moveCarId)">
+					<div class="inf">
+						<p class="left">位置</p>
+						<p class="right">{{item.address}}</p>
+					</div>
+					<div class="inf">
+						<p class="left">车牌号</p>
+						<p class="right">{{item.training_professional}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .3rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;line-height: 0.5rem;">
+			服务热线：0477-8969223
+		</div>
+		<script type="text/javascript">
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					name: '', //姓名
+					idCard: '', // 身份证号
+					code: '', //授权成功返回的code
+					open_Id: '', //打开应用返回的openid
+					appId: '7fdff51a-40e5-4856-b9d9-71636c82af9e',
+					token: '',
+					userId: '',
+					dataList: []
+				},
+				methods: {
+					//跳转详情页面
+					goInfo(moveCarId) {
+						window.location.href = 'move_car_info.html?moveCarId=' + moveCarId + "&token=" + escape(this
+							.token);
+					},
+
+					//进入表单提交页
+					goForm() {
+						window.location.href = 'move_car_form.html?idCard=' + this
+							.idCard + "&name=" + escape(this.name) + "&token=" + escape(this.token) + '&userId=' + this
+							.userId;
+					},
+					getDataList() {
+						let self = this
+						doGetFormToken('https://www.yjhlcity.com/InfoIssue/app/movecar/MSBlistpagemovecar', {}, this
+							.token,
+							function success(code, data) {
+								console.log("获取列表")
+								console.log(data)
+								self.dataList = data.rows
+							}, null, null,
+							function error(obj) {
+								console.log("获取失败")
+							})
+					}
+				},
+				created() {
+					var vConsole = new VConsole();
+				},
+				mounted() {
+					let self = this
+					console.log(window.location.href)
+					this.code = getUrlParam("code")
+					this.open_Id = getUrlParam("open_id")
+
+					//如果没有授权则拉起授权，授权成功则请求后台获取用户信息
+
+					if (this.code == null) {
+						getUserInfo("move_car.html", this.appId)
+					} else {
+						console.log("获取用户信息")
+						getToken(this.code, this.open_Id, this.appId, function success(data) {
+							console.log(data)
+							self.token = data.result.data.token
+							self.name = data.result.data.userInfo.name
+							self.idCard = data.result.data.userInfo.idcard
+							self.userId = data.result.data.userInfo.id
+							self.getDataList()
+						})
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

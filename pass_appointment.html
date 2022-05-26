@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+		<title>关卡通行预约</title>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.1/vconsole.min.js"></script>
+		<script src="js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/util.js" type="text/javascript" charset="utf-8"></script>
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				background-color: #EBF1F6;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				background-color: #EBF1F6;
+				height: 100%;
+			}
+
+			.div_info {
+				background-color: white;
+				display: flex;
+				align-items: center;
+				padding: 20px;
+				margin-top: 15px;
+				border-radius: 4px;
+			}
+
+			.div_info_tv {
+				font-size: 18px;
+				line-height: 18px;
+				margin-left: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<img width="100%" height="auto" src="images/bg.png" />
+			<div style="padding: 20px;">
+				<div style="font-size: 22px;font-weight: 600;">关卡通行预约</div>
+				<div class="div_info" @click="goAppointmentmake()">
+					<img src="images/yuyue.png" width="45px" height="45px" />
+					<p class="div_info_tv">关卡预约</p>
+					<img src="images/go_info.png" width="14px" height="14px" style="margin-left: auto;" />
+				</div>
+				<div class="div_info" @click="goRecord()">
+					<img src="images/jilv.png" width="45px" height="45px" />
+					<p class="div_info_tv">预约结果</p>
+					<img src="images/go_info.png" width="14px" height="14px" style="margin-left: auto;" />
+				</div>
+
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					name: '', //姓名
+					idCard: '', // 身份证号
+					code: '', //授权成功返回的code
+					open_Id: '', //打开应用返回的openid
+					appId: '0b672310-5994-42e2-a8bb-29941bdb7975'
+				},
+				methods: {
+					//获取页面传参
+					getUrlParam: function(name) {
+						var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+						var r = window.location.search.substr(1).match(reg); //匹配目标参数
+						if (r != null) return unescape(r[2]);
+						return null; //返回参数值
+					},
+					//历史记录
+					goRecord() {
+						if (this.name == "") {
+							console.log("没有获取到用户信息")
+							return
+						}
+						window.location.href =
+							'https://www.yjhlcity.com/epidemiccontrol/route/shop-user-record/history?idCard=' + this
+							.idCard;
+					},
+					//关卡预约
+					goAppointmentmake() {
+						if (this.name == "") {
+							console.log("没有获取到用户信息")
+							return
+						}
+						window.location.href =
+							'https://www.yjhlcity.com/epidemiccontrol/route/appointment/save-release?idCard=' + this
+							.idCard + "&name=" + escape(this.name);
+					},
+					//拉起授权获取用户信息
+					// getUserInfo() {
+					// 	doGetForm(
+					// 		'https://app.zwfw.nmg.gov.cn:4443/icity/auth2.0/authorize', {}, null,
+					// 		function(code, data) {}, null, null,
+					// 		function() {
+
+					// 		});
+					// 	var url = encodeURI("https://www.yjhlcity.com/ysb_msbjr/pass_appointment.html")
+					// 	window.location.href =
+					// 		'https://app.zwfw.nmg.gov.cn:4443/icity/auth2.0/authorize?app_id=' + this.appId +
+					// 		'&redirect_uri=' +
+					// 		url + '&scope=auth_user&state=';
+					// },
+					//请求后台获取用户信息
+					// getToken() {
+					// 	var self = this;
+					// 	console.log("code" + self.code)
+					// 	let data = {
+					// 		code: self.code,
+					// 		openId: this.open_Id,
+					// 		appId: this.appId
+					// 	}
+					// 	console.log("提交的参数")
+					// 	console.log(data)
+
+					// 	doPostJson(
+					// 		'https://www.yjhlcity.com/usercenter/app/msbsign/checkMsbCoderelease', data,
+					// 		null,
+					// 		function(code, data) {
+					// 			console.log("登录成功返回数据")
+					// 			console.log(data)
+					// 			self.name = data.result.data.userInfo.name
+					// 			self.idCard = data.result.data.userInfo.idcard
+					// 		}, null, null,
+					// 		function(obj) {
+					// 			console.log("登录失败返回数据")
+					// 			console.log(obj)
+					// 		});
+					// },
+
+
+				},
+				created() {
+					var vConsole = new VConsole();
+				},
+				mounted() {
+					let self=this
+					// console.log(window.location.href)
+					this.code = this.getUrlParam("code")
+					this.open_Id = this.getUrlParam("open_id")
+					// localStorage.setItem("open_Id",this.open_Id)
+					//如果没有授权则拉起授权，授权成功则请求后台获取用户信息
+
+					if (this.code == null) {
+						getUserInfo("pass_appointment.html", this.appId)
+					} else {
+						console.log("获取用户信息")
+						getToken(this.code, this.open_Id, this.appId, function success(data) {
+							console.log(data)
+							self.token = data.result.data.token
+							self.name = data.result.data.userInfo.name
+							self.idCard = data.result.data.userInfo.idcard
+						})
+
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

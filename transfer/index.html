@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>转学办理</title>
+		<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.1/vconsole.min.js"></script>
+		<script src="../js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/rem.js"></script>
+		<script src="../js/util.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" href="../css/moudle.css">
+<!--		<link rel="stylesheet" href="../css/hierarchyList.css">-->
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				background-color: #FFFFFF;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				background-color: #FFFFFF;
+				height: 90%;
+				display: flex;
+				flex-direction: column;
+				overflow: auto;
+			}
+
+			.cm-page-input {
+				background-color: #fff;
+				width: 85%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				display: flex;
+				align-items: center;
+				align-self: center;
+				padding: 0.3rem;
+				margin-top: .5rem;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: .7rem;
+				background: #00ae7e;
+				border-radius: 3px;
+				font-size: .28rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .4rem;
+				border: 0;
+				letter-spacing: 1.5px;
+				outline: none;
+			}
+
+			.tag {
+				font-size: .28rem;
+				color: black;
+				font-weight: bold;
+				margin: .8rem .55rem .2rem .55rem;
+			}
+
+			.list {
+				background-color: #eaeaea;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="cm-page-input">
+				<button class="cm-page-btn" @click="goForm()">转学申请</button>
+			</div>
+			<p class="tag">申请列表</p>
+			<div v-if="transferList.length==0"
+				 style="width: 100%;height: auto;margin-top: 100px; display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="../images/none.png" />
+			</div>
+			<div v-else class="list">
+				<div v-for="(item,index) in transferList" :key="index" style="background-color: #ffffff;margin-bottom:.1rem;padding: 0 0.3rem;"
+					 @click="goInfo(item.transferSchoolId)">
+					<div class="inf">
+						<p class="left">学生姓名</p>
+						<p class="right">{{item.userName}}</p>
+					</div>
+					<div class="inf">
+						<p class="left">学校</p>
+						<p class="right">{{item.schoolName}}</p>
+					</div>
+				</div>
+			</div>
+<!--			<div class="hierarchyList">-->
+<!--				<div class="list1"><p>1</p><p>向教育局教育股提出转学申请向教育局教育股提出转学申请</p></div>-->
+<!--				<div class="contentList">学生监护人在规定时间内持相关材料向教育局教育股提出转学申请</div>-->
+<!--				<div class="list2">一、受理转学时间</div>-->
+<!--				<div class="contentList">一般为每学年二月份、八月份（学校开学前俩周办理）</div>-->
+<!--				<div class="list2">二、需要提供材料</div>-->
+<!--				<div class="list3">（1）学生、家长或其监护人居民户口簿原件、复印件；</div>-->
+<!--				<div class="list3">（2）监护人居住证明</div>-->
+<!--				<div class="contentList">1）购房合同及缴款收据原件、复印件；</div>-->
+<!--				<div class="contentList">2）房产证、复印件；</div>-->
+<!--				<div class="contentList">3）旗外户籍租房提供居住证及近三个月水、电、燃气其中一项收据即可；</div>-->
+<!--				<div class="contentList">4）旗内户籍租房提供社区居住证明及近三个月水、电、燃气其中一项收据即可。</div>-->
+<!--				<div class="list1"><p>2</p><p>审核材料</p></div>-->
+<!--				<div class="contentList">教育局审核材料后予以登记。</div>-->
+<!--				<div class="list1"><p>3</p><p>统一分配</p></div>-->
+<!--				<div class="contentList">开学前，教育局统一分配转学生，打印转学派遣单。</div>-->
+<!--				<div class="list1"><p>4</p><p>就读报道</p></div>-->
+<!--				<div class="contentList">学生监护人持派遣单到所分配就读学校报道。</div>-->
+<!--				<div class="list1"><p>5</p><p>电子档案调档</p></div>-->
+<!--				<div class="contentList">学校和教育局再在全国学籍系统中为转学生办理电子档案调档工作，学校为转学生接续管理学籍档案。</div>-->
+<!--			</div>-->
+<!--			<p class="tag" style="margin-top: 1rem">备注：</p>-->
+<!--			<div class="hierarchyList">-->
+<!--				<div class="contentListNoLeft">1.学生转学只能在同一年级办理，不得跨年级转学</div>-->
+<!--				<div class="contentListNoLeft">2.个学段起始年级第一学期不得转学。</div>-->
+<!--				<div class="contentListNoLeft">3.为防止中、高考一命，影响全市正常的考试招生秩序。初三年级上学期只允许市内转学；初三年级下学期、高三年级俩学期除转出市外的情况外，均不得转学。</div>-->
+<!--				<div class="contentListNoLeft">4.高中学生转学，需到市教育局基教科办理相关手续</div>-->
+<!--			</div>-->
+		</div>
+		<div style="font-size: 10px;color: #eaeaea;text-align: center;margin-top: .3rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: #eaeaea;text-align: center;line-height: 0.5rem;">
+			服务热线：0477-8969223
+		</div>
+
+		<script type="text/javascript">
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					name: '', //姓名
+					idCard: '', // 身份证号
+					code: '', //授权成功返回的code
+					open_Id: '', //打开应用返回的openid
+					appId: 'c9d8fcbe-0d2e-4608-831d-c31c48a212f5',
+					transferList:[],
+					userId:'',
+					token : ""
+				},
+				methods: {
+					goInfo(id) {
+						window.location.href = 'detail.html?id=' + id + "&token=" + escape(this.token);
+					},
+
+
+					//进入表单提交页
+					goForm() {
+						window.location.href = 'form.html?id=' + this
+							.userId + "&token=" + escape(this.token) +'&name='+escape(this.name) +'&idCard='+this.idCard;
+					},
+				},
+				created() {
+					//var vConsole = new VConsole();
+					let self = this
+					console.log(window.location.href)
+					this.code = getUrlParam("code")
+					this.open_Id = getUrlParam("open_id")
+
+					//如果没有授权则拉起授权，授权成功则请求后台获取用户信息
+					if (this.code == null) {
+						getUserInfo("./transfer/index.html", this.appId)
+					} else {
+						console.log("获取用户信息")
+						getToken(this.code, this.open_Id, this.appId, function success(data) {
+							console.log(data)
+							self.token = data.result.data.token
+							self.name = data.result.data.userInfo.name
+							self.idCard = data.result.data.userInfo.idcard
+							self.userId = data.result.data.userInfo.id
+
+							doGetFormToken(
+									`https://www.yjhlcity.com/InfoIssue/app/transferschool/listtransferschool?userId=${self.userId}`,null,
+									self.token,
+									function(code, data) {
+										console.log('--------')
+										console.log(data)
+										console.log('--------')
+										self.transferList = data
+									},
+									function() {
+
+									});
+						})
+
+					}
+				},
+				mounted() {
+
+				}
+			})
+		</script>
+	</body>
+</html>

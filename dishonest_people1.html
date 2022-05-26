@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>失信人员查询</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+
+		<script src="js/rem.js"></script>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%;">
+			<div class="Head" style="z-index: -99;">
+				<img src="./images/lishiwenhua.jpg" style="width: 100%;height: 100%;">
+			</div>
+			<div class="cm-page-input">
+				<div class="cm-page-text">失信人员查询</div>
+				<div class="cm-page-type" style="display:inline; ">
+					<input type="text" style="width:100%;" placeholder="请输入身份证号码" v-model="name">
+				</div>
+				<div class="cm-page-btn">
+					<button @click="search(name)">查询</button>
+				</div>
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .35rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: 0.8rem;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					app_id:'',
+					code:'',
+					grant_type:'authorization_code',
+					refresh_token:'',
+					sign:''
+				},
+
+				methods: {
+					getUrlParam: function(name) {
+						var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+						var r = window.location.search.substr(1).match(reg); //匹配目标参数
+						if (r != null) return unescape(r[2]);
+						return null; //返回参数值
+					},
+					search: function() {
+						var self = this;
+						// 判断卡号是否为空，为空返回
+						if (self.name == '' || self.name == null) {
+							layer.msg("身份证号不能为空");
+							return false;
+						} else {
+							window.location.href = 'dishonest_people_detail.html?name=' + escape(self.name.trim());
+						}
+						localStorage.setItem("name", self.name)
+					},
+					// getSign(){
+					// 	let signStr='app_id='+this.app_id+'&code='+this.code+'&grant_type='+this.grant_type+'&refresh_token='+this.refresh_token
+					// 	alert(signStr)
+						
+					// }
+				
+				},
+				
+				
+
+				created: function(e) {
+					this.name = localStorage.getItem('name')
+				},
+
+				mounted() {
+					// 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据
+					window.onbeforeunload = function(e) {
+						var storage = window.localStorage;
+						storage.clear()
+					}
+					this.app_id=this.getUrlParam('app_id')
+					this.code=this.getUrlParam('code')
+					// this.getSign()
+				}
+
+			});
+		</script>

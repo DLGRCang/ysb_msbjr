@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>医院药店查询</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+		<script src="js/rem.js"></script>
+		<style>
+			.cm-page-input {
+				background-color: #fff;
+				width: 80%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				margin: -15px auto;
+				display: flex;
+				flex-direction: column;
+				padding: 0.4rem 0.3rem;
+			}
+
+			.cm-page-type {
+				display: flex;
+			}
+
+			.cm-page-type input {
+				width: 100%;
+				height: .78rem;
+				border: 1px solid #EEEEEE;
+				outline: 0;
+				font-size: .3rem;
+				color: #333333;
+				padding: .18rem;
+				box-sizing: border-box;
+				margin-left: 0.2rem;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: 1rem;
+				margin-top: 0;
+				padding-top: 0;
+				display: flex;
+				align-items: flex-end;
+				/* margin-top: .6rem; */
+			}
+
+			.cm-page-btn button {
+				width: 100%;
+				height: 0.8rem;
+				background: rgba(0, 174, 126, 1);
+				border-radius: 3px;
+				font-size: .3rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .8rem;
+				border: 0;
+				outline: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%; overflow:auto;background-color: #eaeaea;">
+			<div class="Head" style="z-index: -99;">
+				<img src="./images/yyyd.jpg" style="width: 100%;height: 100%;">
+			</div>
+			<div style="background-color: white;width: 100%;margin-bottom: .2rem;padding-bottom: .5rem;">
+				<div class="cm-page-input">
+					<div class="cm-page-type">
+						<select style="padding:0 10px;border-color: #EEEEEE;background-color: white;" v-model="selectValue">
+							<option value="0" selected>全部</option>
+							<option value="1">医院</option>
+							<option value="2">药店</option>
+						</select>
+						<input type="text" style="width:100%;" placeholder="请输入医院药店名称" v-model="name">
+					</div>
+					<div class="cm-page-btn">
+						<button @click="search(name)">查询</button>
+					</div>
+				</div>
+			</div>
+			<div v-if="showList.length==0" style="width: 100%;height: auto;margin-top: 50px; display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="images/none.png" />
+			</div>
+
+			<div  v-if="item.contactNumber!='无'"  v-else v-for="(item, index) in showList"
+				style="background-color: #ffffff;margin-bottom:.2rem;padding: 0 0.3rem;">
+				<div class="inf">
+					<p class="left">名称</p>
+					<p class="right">{{item.medicalName}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">位置</p>
+					<p class="right">{{item.address}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">开放时间</p>
+					<p class="right">{{item.businessHours}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">服务热线</p>
+					<p class="right" style="color: #009F95;text-decoration: underline;"
+						@click="call(item.contactNumber)">{{item.contactNumber}}</p>
+				</div>
+
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .35rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: 0.8rem;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					selectValue: 0,
+					dataList: [],
+					showList: [],
+				},
+				created: function(e) {
+					this.name = localStorage.getItem('name')==null?'':localStorage.getItem('name')
+				},
+				methods: {
+					call(number) {
+						window.location.href = 'tel:' + number;
+					},
+					search: function() {
+						
+						this.showList = []
+						console.log(this.selectValue)
+						if (this.selectValue == 1) {
+							let list = []
+							let it = {}
+							for (var i = 0; i < this.dataList.length; i++) {
+								if (this.dataList[i].medicalName.indexOf(this.name) >= 0 && this.dataList[i].type ==
+									"1") {
+									it = this.dataList[i]
+									list.push(it)
+								}
+							}
+							this.showList = list
+						} else if (this.selectValue == 2) {
+							let list = []
+							let it = {}
+							for (var i = 0; i < this.dataList.length; i++) {
+								if (this.dataList[i].medicalName.indexOf(this.name) >= 0 && this.dataList[i].type ==
+									"2") {
+									it = this.dataList[i]
+									list.push(it)
+								}
+							}
+							this.showList = list
+						} else {
+
+							let list = []
+							let it = {}
+							for (var i = 0; i < this.dataList.length; i++) {
+								if (this.dataList[i].medicalName.indexOf(this.name) >= 0) {
+									it = this.dataList[i]
+									list.push(it)
+								}
+							}
+							this.showList = list
+						}
+
+					},
+					getInfo: function() {
+						var self = this;
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/medical/listpagemedical?page=1&size=100', {},
+							null,
+							function(code, data) {
+								self.dataList = data.rows
+								self.showList = self.dataList;
+							}, null, null,
+							function() {
+
+							});
+					},
+
+				},
+				mounted() {
+					// 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据
+					window.onbeforeunload = function(e) {
+						var storage = window.localStorage;
+						storage.clear()
+					}
+					this.getInfo()
+				}
+			});
+		</script>

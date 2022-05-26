@@ -1,0 +1,132 @@
+.cm-page-title {
+	font-size: .37rem;
+	text-align: center;
+	padding: .2rem 0;
+	background: #ffffff;
+	color: #000000;
+	position: relative
+}
+
+.cm-page-title a {
+	display: block;
+	width: .22rem;
+	height: 100%;
+	background: url(../images/back-btn.png) no-repeat center;
+	background-size: .22rem .36rem;
+	position: absolute;
+	top: 0;
+	left: .2rem
+}
+
+.line {
+	width: 100%;
+	height: .1rem;
+	background-color: #eaeaea;
+}
+
+.cm-page-input {
+	background-color: #fff;
+	width: 80%;
+	border: 1px solid #eaeaea;
+	border-radius: .06rem;
+	padding: .35rem;
+	margin: -15px auto;
+	position: relative;
+}
+
+.cm-page-text {
+	font-size: .36rem;
+	color: #333333;
+	font-weight: 600;
+}
+
+.cm-page-type input {
+	width: 100%;
+	height: .78rem;
+	border: 1px solid #EEEEEE;
+	outline: 0;
+	font-size: .3rem;
+	color: #333333;
+	padding: .18rem;
+	box-sizing: border-box
+}
+
+.cm-page-btn {
+	width: 100%;
+	height: 2rem;
+	text-align: center;
+	/* margin-top: .6rem; */
+}
+
+.cm-page-btn button {
+	width: 100%;
+	height: .8rem;
+	background: rgba(0, 174, 126, 1);
+	border-radius: 3px;
+	font-size: .3rem;
+	color: rgba(255, 255, 255, 1);
+	line-height: .4rem;
+	border: 0;
+	outline: none;
+}
+
+.inf {
+	border-bottom: 1px solid #eaeaea;
+	display: flex;
+	justify-content: space-between;
+}
+
+.inf li {
+	height: .94rem;
+	border-bottom: 1px solid #EEEEEE;
+	line-height: .94rem;
+	font-size: 0;
+}
+
+.inf .left {
+	display: flex;
+	height: auto;
+	min-width: 50px;
+	padding-left: .3rem;
+	font-size: .3rem;
+	color: #333333;
+	margin: 15px 0;
+	align-items: center;
+}
+
+.inf .right {
+	display: flex;
+	align-items: center;
+	height: auto;
+	float: right;
+	padding-right: .3rem;
+	font-size: .3rem;
+	max-width: 260px;
+	text-align: right;
+	line-height: .45rem;
+	margin: 15px 0;
+	color: #666666;
+}
+
+.form_input {
+	display: flex;
+	align-items: center;
+	border-bottom: #e1e1e1 1px solid;
+}
+
+.form_input_tap {
+	font-size: .26rem;
+	color:#000000;
+	
+}
+
+.form_input_input {
+	height: auto;
+	flex: 1;
+	font-size: .26rem;
+	color: #525252;
+	padding: .18rem;
+	border: none;
+	outline: none;
+}
+

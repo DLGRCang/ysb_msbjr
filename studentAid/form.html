@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+		<title>资助申请</title>
+		<link rel="stylesheet" type="text/css" href="../css/moudle.css" />
+		<link rel="stylesheet" type="text/css" href="../css/vant.min.css" />
+		<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vant_min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/util.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/axios.min.js.js" type="text/javascript" charset="utf-8"></script>
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				height: 100%;
+				padding: 15px;
+			}
+
+			.van-calendar {
+				height: 98%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+
+			<van-field v-if="applyType !== '3'" v-model="schoolName" label="学校名称" placeholder="请输入学校名称"></van-field>
+			<van-field v-if="applyType !== '3'" v-model="entranceYearSeason" is-link readonly label="入学年月" placeholder="请选择" @click="showDate = true">
+			</van-field>
+			<van-popup v-model:show="showDate" position="bottom">
+				<van-datetime-picker
+						v-model="currentDate"
+						type="year-month"
+						title="选择年月"
+						:min-date="minDate"
+						:max-date="maxDate"
+						:formatter="formatter" @confirm="onConfirmDate($event)" @cancel="showDate = false"
+				/>
+			</van-popup>
+			<div class="van-cell van-field" v-if="applyType !== '3'">
+				<div class="van-cell__title van-field__label">
+					<span>入学季节</span>
+				</div>
+				<van-radio-group v-model="entranceSeason" direction="horizontal">
+					<van-radio name="春" checked-color="#00ae7e">春</van-radio>
+					<van-radio name="夏" checked-color="#00ae7e">夏</van-radio>
+					<van-radio name="秋" checked-color="#00ae7e">秋</van-radio>
+					<van-radio name="冬" checked-color="#00ae7e">冬</van-radio>
+				</van-radio-group>
+			</div>
+			<van-field v-model="studentName" label="学生姓名" placeholder="请输入学生姓名"></van-field>
+			<van-field v-if="applyType === '3'" v-model="examineeNumber" label="考生号" placeholder="请输入考生号"></van-field>
+			<van-field v-if="applyType === '3'" v-model="graduationSchool" label="毕业院校" placeholder="请输入毕业院校"></van-field>
+			<van-field v-if="applyType === '3'" v-model="admissionSchoolName" label="录取院校" placeholder="请输入录取院校"></van-field>
+			<div class="van-cell van-field" v-if="applyType === '3'">
+				<div class="van-cell__title van-field__label">
+					<span>录取层次</span>
+				</div>
+				<van-radio-group v-model="admissionLevel" direction="horizontal">
+					<van-radio name="专科" checked-color="#00ae7e">专科</van-radio>
+					<van-radio name="本科" checked-color="#00ae7e">本科</van-radio>
+				</van-radio-group>
+			</div>
+
+			<div class="van-cell van-field">
+				<div class="van-cell__title van-field__label">
+					<span>性别</span>
+				</div>
+				<van-radio-group v-model="studentSex" direction="horizontal">
+					<van-radio name="男" checked-color="#00ae7e">男</van-radio>
+					<van-radio name="女" checked-color="#00ae7e">女</van-radio>
+				</van-radio-group>
+			</div>
+			<van-field v-if="applyType === '3'" v-model="educational" label="学制" placeholder="请输入学制"></van-field>
+			<van-field v-model="studentIdCard" label="身份证号" placeholder="请输入身份证号"></van-field>
+
+			<van-field v-model="studentNational" is-link readonly label="民族" placeholder="点击选择" @click="showPicker = true">
+			</van-field>
+			<van-popup v-model:show="showPicker" position="bottom">
+				<van-picker :columns="columns" @confirm="onConfirm($event,'studentNational')" @cancel="showPicker = false"
+							show-toolbar />
+			</van-popup>
+			<van-field v-if="applyType === '1'" v-model="enrollmentNumber" label="学籍号" placeholder="请输入学籍号"></van-field>
+			<van-field v-if="applyType !== '3'" v-model="studentGrade" label="年级" placeholder="请输入年级"></van-field>
+			<van-field v-if="applyType !== '3'" v-model="studentClass" label="班级" placeholder="请输入班级"></van-field>
+			<div class="van-cell van-field" v-if="applyType !== '3'">
+				<div class="van-cell__title van-field__label">
+					<span>国家级建档立卡贫困户</span>
+				</div>
+				<van-radio-group v-model="countriesInputting" direction="horizontal">
+					<van-radio name="是" checked-color="#00ae7e">是</van-radio>
+					<van-radio name="否" checked-color="#00ae7e">否</van-radio>
+				</van-radio-group>
+			</div>
+			<van-field v-model="registeredPlace" label="户籍所在地" placeholder="请输入户籍所在地"></van-field>
+			<van-field v-model="personContact" label="本人联系方式" placeholder="请输入本人联系方式"></van-field>
+
+			<div class="van-cell van-field" v-if="applyType === '3'">
+				<div class="van-cell__title van-field__label">
+					<span>困难类型</span>
+				</div>
+				<van-radio-group v-model="difficultType">
+					<van-radio name="城乡低保家庭子女" checked-color="#00ae7e">城乡低保家庭子女</van-radio>
+					<van-radio name="建档立卡贫困家庭子女" checked-color="#00ae7e">建档立卡贫困家庭子女</van-radio>
+					<van-radio name="孤儿" checked-color="#00ae7e">孤儿</van-radio>
+				</van-radio-group>
+			</div>
+			<van-field v-if="applyType === '3'" v-model="establishArchiveNumber" label="低保/建档立卡/孤儿序号" placeholder="请输入低保/建档立卡/孤儿序号"></van-field>
+			<van-field v-if="applyType === '3'" v-model="establishArchiveDate" is-link readonly label="低保/建档立卡/孤儿凭证审核时间" placeholder="请选择" @click="showDate2 = true">
+			</van-field>
+			<van-popup v-model:show="showDate2" position="bottom">
+				<van-datetime-picker
+						v-model="currentDate2"
+						type="date"
+						title="选择年月日"
+						:min-date="minDate2"
+						:max-date="maxDate2"
+						:formatter="formatter1" @confirm="onConfirmDate2($event)" @cancel="showDate2 = false"
+				/>
+			</van-popup>
+			<van-field v-if="applyType === '3'" v-model="applyPersonRelation" label="与申请人关系" placeholder="请输入与申请人关系"></van-field>
+			<van-field v-model="guardianName" label="监护人姓名" placeholder="请输入监护人姓名"></van-field>
+			<van-field v-model="guardianIdCard" label="监护人身份证号" placeholder="请输入监护人身份证号"></van-field>
+			<van-field v-if="applyType === '3'" v-model="guardianAddress" label="监护人户籍所在地" placeholder="请输入监护人户籍所在地"></van-field>
+			<van-field v-model="guardianContact" label="监护人联系方式" placeholder="请输入监护人联系方式"></van-field>
+			<div class="van-cell van-field">
+				<div class="van-cell__title van-field__label">
+					<span>户籍性质</span>
+				</div>
+				<van-radio-group v-model="registrationNature" direction="horizontal">
+					<van-radio name="农民" checked-color="#00ae7e">农民</van-radio>
+					<van-radio name="非农" checked-color="#00ae7e">非农</van-radio>
+				</van-radio-group>
+			</div>
+			<div class="van-cell van-field" v-if="applyType === '1'">
+				<div class="van-cell__title van-field__label">
+					<span>是否住校</span>
+				</div>
+				<van-radio-group v-model="whetherResidence" direction="horizontal">
+					<van-radio name="住校" checked-color="#00ae7e">住校</van-radio>
+					<van-radio name="跑校" checked-color="#00ae7e">跑校</van-radio>
+				</van-radio-group>
+			</div>
+			<van-field  v-if="applyType !== '3'" v-model="incomeSource" label="主要收入来源" placeholder="请输入主要收入来源"></van-field>
+			<van-field v-if="applyType === '2'" v-model="familyIncomeCapita" label="家庭年均收入（人）" placeholder="请输入家庭年均收入"></van-field>
+			<div class="van-cell van-field" v-if="applyType !== '3'">
+				<div class="van-cell__title van-field__label">
+					<span>是否低保户</span>
+				</div>
+				<van-radio-group v-model="whetherLow" direction="horizontal">
+					<van-radio name="住校" checked-color="#00ae7e">是</van-radio>
+					<van-radio name="跑校" checked-color="#00ae7e">否</van-radio>
+				</van-radio-group>
+			</div>
+			<van-field v-if="applyType !== '3'" v-model="nowFamilyAddress" label="家庭现住址" placeholder="请输入家庭现住址"></van-field>
+			<van-field v-if="applyType === '2'" v-model="applyBook" label="申请书" placeholder="请输入申请书"></van-field>
+			<van-field v-if="applyType === '2'" v-model="applyReason" label="申请理由" placeholder="请输入申请理由"></van-field>
+			<van-field v-if="applyType === '1'" v-model="fundCardNumber" label="资助卡号" placeholder="请输入资助卡号"></van-field>
+			<van-field v-if="applyType === '1'" v-model="fundAmonunt" label="申请金额（元）" placeholder="请输入申请金额（元）"></van-field>
+			<van-field v-if="applyType === '1'" v-model="identifyTime" is-link readonly label="识别时间" placeholder="请选择" @click="showDate1 = true">
+			</van-field>
+			<van-popup v-model:show="showDate1" position="bottom">
+				<van-datetime-picker
+						v-model="currentDate1"
+						type="date"
+						title="选择年月日"
+						:min-date="minDate1"
+						:max-date="maxDate1"
+						:formatter="formatter1" @confirm="onConfirmDate1($event)" @cancel="showDate1 = false"
+				/>
+			</van-popup>
+			<van-field v-if="applyType === '1'" v-model="supportResponsible" label="帮扶责任人" placeholder="请输入帮扶责任人"></van-field>
+			<van-field v-if="applyType === '1'" v-model="responsibleUnit" label="帮扶人工作单位" placeholder="请输入帮扶人工作单位"></van-field>
+			<van-field v-if="applyType === '1'" v-model="responsibleContact" label="帮扶人联系方式" placeholder="请输入帮扶人联系方式"></van-field>
+
+			<van-cell-group>
+				<van-cell title="学生照片">
+					<van-uploader v-model="fileList" :file-list="fileList" :after-read="afterRead" max-count="1"></van-uploader>
+				</van-cell>
+			</van-cell-group>
+
+			<van-cell-group v-if="applyType !== '3'">
+				<van-cell title="已添加家庭成员" :value="studentFamilyVo.length+'人'" is-link @click="showNoFamily = true"></van-cell>
+				<van-cell title="添加家庭成员" is-link @click="showFamily = true"/>
+			</van-cell-group>
+			<van-popup v-model:show="showFamily" position="bottom" style="padding: .4rem">
+				<van-field v-model="familyMemberName" label="姓名" placeholder="请输入姓名"></van-field>
+				<van-field v-model="familyMemberIdCard" label="身份证号" placeholder="请输入身份证号"></van-field>
+				<van-field v-model="familyMemberRelation" label="与本人关系" placeholder="请输入与本人关系"></van-field>
+				<van-field v-model="workLearnUnit" label="工作/学习单位" placeholder="请输入单位"></van-field>
+				<van-button round block type="info" @click="onFamily" color="#00ae7e">添加</van-button>
+			</van-popup>
+			<van-popup v-model:show="showNoFamily" position="bottom" style="padding: .4rem" :style="{ height: '50%' }">
+				<p v-if="studentFamilyVo.length === 0" style="text-align: center">暂无家庭成员</p>
+				<div style="border: 1px solid #eaeaea;border-radius: 5px;margin-bottom: .2rem" v-for="(item,index) in studentFamilyVo" :key="index">
+					<van-cell-group>
+						<van-cell title="姓名" :value="item.familyMemberName"></van-cell>
+						<van-cell title="身份证号" :value="item.familyMemberIdCard"></van-cell>
+						<van-cell title="与本人关系" :value="item.familyMemberRelation"></van-cell>
+						<van-cell title="工作/学习单位" :value="item.workLearnUnit === '' ? '无':item.workLearnUnit"></van-cell>
+					</van-cell-group>
+				</div>
+			</van-popup>
+
+			<div style="margin: 16px;">
+				<van-button round block type="info" @click="onSubmit()" color="#00ae7e">提交</van-button>
+			</div>
+
+		</div>
+	</body>
+	<script>
+		let app = new Vue({
+			el: '#app',
+			data: {
+				schoolName: '', //姓名
+				entranceYearSeason:'',
+				entranceSeason:'',
+				studentName:'',
+				studentIdCard: '', // 身份证号
+				enrollmentNumber:'',
+				studentGrade:'',
+				studentClass:'',
+				countriesInputting:'',
+				registeredPlace:'',
+				personContact:'',
+				guardianName:'',
+				guardianContact:'',
+				registrationNature:'',
+				whetherResidence:'',
+				incomeSource:'',
+				whetherLow:'',
+				nowFamilyAddress:'',
+				fundCardNumber:'',
+				fundAmonunt:'',
+				identifyTime:'',
+				supportResponsible:'',
+				responsibleUnit:'',
+				responsibleContact:'',
+				fileList: [],
+				studentFamilyVo:[],
+				examineeNumber:'',
+				graduationSchool:'',
+				admissionSchoolName:'',
+				admissionLevel:'',
+				familyIncomeCapita:'',
+				applyReason:"",
+				applyBook:'',
+				educational:'',
+				guardianIdCard:'',
+				guardianAddress:'',
+				establishArchiveNumber:'',
+				establishArchiveDate:'',
+				difficultType:'',
+				applyPersonRelation:'',
+
+				area: '',
+				studentSex: '男',
+
+				familyMemberName:'',
+				familyMemberIdCard:'',
+				familyMemberRelation:'',
+				workLearnUnit:'',
+
+				studentNational: '',
+				showPicker: false,
+				showDate:false,
+				showDate1:false,
+				showDate2:false,
+				showFamily:false,
+				showNoFamily:false,
+				columns: nations,
+
+				showCalendar: false,
+				date: '',
+				minDate: new Date(1900, 0, 1),
+				maxDate: new Date(),
+				currentDate: new Date(),
+				minDate1: new Date(1900, 0, 1),
+				maxDate1: new Date(),
+				currentDate1: new Date(),
+				minDate2: new Date(1900, 0, 1),
+				maxDate2: new Date(),
+				currentDate2: new Date(),
+				userId:'',
+				token : "",
+				applyType:'',
+
+			},
+			methods: {
+				onFamily(){
+					if(this.familyMemberName === "") return layer.msg("请填写家庭成员姓名");
+					if(this.familyMemberIdCard === "") return layer.msg("请填写家庭成员身份证号");
+					if(this.familyMemberRelation === "") return layer.msg("请填写家庭成员与本人关系");
+						this.studentFamilyVo.push({
+							familyMemberName:this.familyMemberName,
+							familyMemberIdCard:this.familyMemberIdCard,
+							familyMemberRelation:this.familyMemberRelation,
+							workLearnUnit:this.workLearnUnit
+						})
+					this.familyMemberName = ""
+					this.familyMemberIdCard = ""
+					this.familyMemberRelation = ""
+					this.workLearnUnit = ""
+					layer.msg("添加成功");
+				},
+				//提交表单
+				onSubmit() {
+					let fromData = {
+						applyType:this.applyType,
+						schoolName: this.schoolName,
+						entranceYearSeason:this.entranceYearSeason,
+						entranceYear:this.entranceYearSeason === "" ? '2022':this.entranceYearSeason.split('-')[0],
+						studentSex:this.studentSex,
+						entranceSeason:this.entranceSeason,
+						studentNational:this.studentNational,
+						studentName:this.studentName,
+						studentIdCard: this.studentIdCard,
+						enrollmentNumber:this.enrollmentNumber,
+						studentGrade:this.studentGrade,
+						studentClass:this.studentClass,
+						countriesInputting:this.countriesInputting,
+						registeredPlace:this.registeredPlace,
+						personContact:this.personContact,
+						guardianName:this.guardianName,
+						guardianContact:this.guardianContact,
+						registrationNature:this.registrationNature,
+						whetherResidence:this.whetherResidence,
+						incomeSource:this.incomeSource,
+						whetherLow:this.whetherLow,
+						nowFamilyAddress:this.nowFamilyAddress,
+						fundCardNumber:this.fundCardNumber,
+						fundAmonunt:this.fundAmonunt,
+						identifyTime:this.identifyTime,
+						supportResponsible:this.supportResponsible,
+						responsibleUnit:this.responsibleUnit,
+						responsibleContact:this.responsibleUnit,
+						familyList:this.studentFamilyVo,
+						studentPhoto:this.fileList.length === 0 ? undefined:this.fileList[0].id,
+						userId:this.userId,
+						studentId:this.userId,
+						applyState:0,
+						examineeNumber:this.examineeNumber,
+						graduationSchool:this.graduationSchool,
+						admissionSchoolName:this.admissionSchoolName,
+						admissionLevel:this.admissionLevel,
+						familyIncomeCapita:this.familyIncomeCapita,
+						applyReason:this.applyReason,
+						applyBook:this.applyBook,
+						educational:this.educational,
+						guardianIdCard:this.guardianIdCard,
+						guardianAddress:this.guardianAddress,
+						establishArchiveNumber:this.establishArchiveNumber,
+						difficultType:this.difficultType,
+						establishArchiveDate:this.establishArchiveDate,
+						applyPersonRelation:this.applyPersonRelation
+					};
+					console.log(this.token)
+					postJson(
+						'https://www.yjhlcity.com/InfoIssue/app/studentsubsidize/savestudentsubsidize',
+						fromData, this.token,
+						function success(code, data) {
+							if (code == 200) {
+								layer.msg("提交成功")
+								//window.history.back()
+								setTimeout(()=>{
+									window.history.back()
+								},800)
+							} else {
+								layer.msg("提交失败，请重试")
+							}
+							console.log("提交成功返回数据" + code)
+							console.log(data)
+
+						},
+						function error(obj) {
+							console.log(obj)
+							layer.msg(obj.responseJSON.msg)
+						})
+
+
+				},
+				onConfirmDate(value){
+
+					this.entranceYearSeason = value.getFullYear()+'-'+value.getDay()
+					this.showDate = false;
+				},
+				onConfirmDate1(value){
+
+					this.identifyTime = value.getFullYear()+'-'+value.getDay()+'-'+value.getDate()
+					this.showDate1 = false;
+				},
+				onConfirmDate2(value){
+					this.establishArchiveDate = value.getFullYear()+'-'+value.getDay()+'-'+value.getDate()
+					this.showDate2 = false;
+				},
+				onConfirm(value, key) {
+					if (key == 'date') {
+						this[key] = changeDate(value);
+					} else {
+						this[key] = value;
+					}
+					this.showPicker = false;
+					this.showCalendar = false;
+
+				},
+				formatter(type, val) {
+
+					if (type === 'year') {
+						return `${val}年`;
+					} else if (type === 'month') {
+						return `${val}月`;
+					}
+					return val;
+				},
+				formatter1(type, val) {
+
+					if (type === 'year') {
+						return `${val}年`;
+					} else if (type === 'month') {
+						return `${val}月`;
+					}else if (type === 'day') {
+						return `${val}日`;
+					}
+					return val;
+				},
+
+				afterRead(file) {
+					layer.load(1);
+					this.upload(file)
+				},
+
+				upload(file) {
+
+					let self = this
+					var formData = new FormData()
+					formData.append("image", file.file)
+					const config = {
+						headers: {
+							"Content-Type": "multipart/form-data",
+							"token": self.token
+						}
+					};
+
+					axios
+							.post("https://www.yjhlcity.com/InfoIssue/app/file/uploadimage",
+									formData, config)
+							.then(function(response) {
+								if(response.status === 200){
+									self.fileList[self.fileList.length - 1].id = response.data.data
+								}else {
+									layer.msg("图片上传失败")
+								}
+								layer.closeAll('loading');
+
+							})
+							.catch(function(error) {
+								console.log(error);
+							});
+				},
+
+
+
+			},
+			created() {
+
+				this.token = getUrlParam("token")
+				this.userId = getUrlParam("id")
+				this.applyType = getUrlParam("applyType")
+				this.studentName = getUrlParam("name")
+				this.studentIdCard = getUrlParam("idCard")
+
+			}
+		})
+	</script>
+</html>

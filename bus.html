@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>长途汽车查询</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+		<script src="js/rem.js"></script>
+		<style>
+			.cm-page-input {
+				background-color: #fff;
+				width: 80%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				margin: -15px auto;
+				display: flex;
+				flex-direction: column;
+				padding: 0.4rem 0.3rem;
+			}
+
+			.cm-page-type {
+				display: flex;
+			}
+
+			.cm-page-type input {
+				width: 100%;
+				height: .78rem;
+				border: 1px solid #EEEEEE;
+				outline: 0;
+				font-size: .3rem;
+				color: #333333;
+				padding: .18rem;
+				box-sizing: border-box;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: 1rem;
+				margin-top: 0;
+				padding-top: 0;
+				display: flex;
+				align-items: flex-end;
+				/* margin-top: .6rem; */
+			}
+
+			.cm-page-btn button {
+				width: 100%;
+				height: 0.8rem;
+				background: rgba(0, 174, 126, 1);
+				border-radius: 3px;
+				font-size: .3rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .8rem;
+				border: 0;
+				outline: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%; overflow:auto;background-color: #eaeaea;">
+			<div class="Head" style="z-index: -99;">
+				<img src="./images/changtuqiche.jpg" style="width: 100%;height: 100%;">
+			</div>
+			<div style="background-color: white;width: 100%;margin-bottom: .2rem;padding-bottom: .5rem;">
+				<div class="cm-page-input">
+					<div style="display: flex;align-items: center;">
+						<p style="font-size: 16px;margin-right: 15px;">目的地:</p>
+						<select style="padding:0 10px;border-color: #EEEEEE;width: 75%;height: 45px;margin-left: auto;line-height: 45px;background-color: white;"
+							v-model="selectValue">
+							<option value="请选择" selected>请选择目的地</option>
+							<option v-for="(item,index) in areaList" :value="item">{{item}}</option>
+						</select>
+					</div>
+					<div class="cm-page-btn">
+						<button @click="search(name)">查询</button>
+					</div>
+				</div>
+			</div>
+			<div v-if="showList.length==0"
+				style="width: 100%;height: auto;margin-top: 50px; display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="images/none.png" />
+			</div>
+
+			<div v-else v-for="(item, index) in showList"
+				style="background-color: #ffffff;margin-bottom:.2rem;padding: 0 0.3rem;">
+				<div class="inf">
+					<p class="left">发车时间</p>
+					<p class="right">{{item.departure_time}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">始发站</p>
+					<p class="right">{{item.of_departure}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">终点站</p>
+					<p class="right">{{item.the_terminal}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">途径</p>
+					<p class="right">{{item.way}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">票价</p>
+					<p class="right">{{item.price}}</p>
+				</div>
+
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .35rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: 0.5rem;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					selectValue: '请选择',
+					name: '',
+					areaList: [],
+					showList: []
+				},
+				created: function(e) {
+					this.name = localStorage.getItem('name') == null ? '' : localStorage.getItem('name')
+				},
+				methods: {
+					search: function() {
+						if (this.selectValue == '请选择') {
+							layer.msg("请选择终点站");
+							return
+						}
+						this.getInfo()
+					},
+					call(number) {
+						window.location.href = 'tel:' + number;
+					},
+					getAreas() {
+						var self = this;
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/longbus/listterminal', {},
+							null,
+							function(code, data) {
+								console.log(data)
+								self.areaList = data;
+							}, null, null,
+							function() {
+
+							});
+
+					},
+					getInfo: function() {
+						var self = this;
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/longbus/listlongbusbyterminal/' +
+							self.selectValue, {},
+							null,
+							function(code, data) {
+								console.log(data)
+								self.showList = data;
+							}, null, null,
+							function() {
+
+							});
+					},
+
+				},
+				mounted() {
+					// 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据
+					window.onbeforeunload = function(e) {
+						var storage = window.localStorage;
+						storage.clear()
+					}
+					this.getInfo()
+					this.getAreas()
+				}
+
+
+			});
+		</script>

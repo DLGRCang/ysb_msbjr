@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>详情</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+		<script src="js/rem.js"></script>
+		<style>
+			.htmlImg {
+				font-size: 16px;
+					background-color: white;
+			}
+
+			.htmlImg img {
+				width: 100% !important;
+				height: auto !important;
+			}
+
+			.htmlImg video {
+				width: 100% !important;
+				height: auto !important;
+			}
+
+			.cm-page-input {
+				background-color: #fff;
+				width: 80%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				margin: -15px auto;
+				display: flex;
+				flex-direction: column;
+				padding: 0.4rem 0.3rem;
+			}
+
+			.cm-page-type {
+				display: flex;
+			}
+
+			.cm-page-type input {
+				width: 100%;
+				height: .78rem;
+				border: 1px solid #EEEEEE;
+				outline: 0;
+				font-size: .3rem;
+				color: #333333;
+				padding: .18rem;
+				box-sizing: border-box;
+				margin-left: 0.2rem;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: 1rem;
+				margin-top: 0;
+				padding-top: 0;
+				display: flex;
+				align-items: flex-end;
+				/* margin-top: .6rem; */
+			}
+
+			.cm-page-btn button {
+				width: 100%;
+				height: 0.8rem;
+				background: rgba(0, 174, 126, 1);
+				border-radius: 3px;
+				font-size: .3rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .8rem;
+				border: 0;
+				outline: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%; overflow:auto;background-color: #fff;">
+		
+			<div style="padding:10px;">
+				<div style="font-size: 18px;font-weight: bold;padding: 10px;">{{title}}</div>
+				<!-- <div style="font-size: 16px;display: flex;margin-top: 10px;margin-bottom: 10px;">
+					<p
+						style="width: 5px;background-color:#009F95;height: 16px;border-radius: 2px;margin-top: 3px;margin-right: 5px;">
+					</p>学校简介
+				</div> -->
+				<div class="htmlImg" v-html="content" style="padding:15px ;"></div>
+				<!-- <html>{{schoolData.particulars}}</html> -->
+				<!-- <iframe :src="schoolData.particulars"></iframe> -->
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .35rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: 0.8rem;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					id:'',
+					title:'',
+					content:''
+				},
+				created: function(e) {
+
+				},
+				methods: {
+					getUrlParam: function(name) {
+						var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+						var r = window.location.search.substr(1).match(reg); //匹配目标参数
+						if (r != null) return unescape(r[2]);
+						return null; //返回参数值
+					},
+					// getInfo: function(schoolId) {
+					// 	var self = this;
+					// 	var arrEntities = {
+					// 		'lt': '<',
+					// 		'gt': '>',
+					// 		'nbsp': ' ',
+					// 		'amp': '&',
+					// 		'quot;': '"',
+					// 		'quot': '"'
+					// 	};
+
+					// 	doGetForm(
+					// 		'https://www.yjhlcity.com/InfoIssue/app/release/schoolinformation/getschoollist/' +
+					// 		schoolId, {},
+					// 		null,
+					// 		function(code, data) {
+					// 			self.schoolData = data
+					// 			self.schoolData.photo =
+					// 				"https://www.yjhlcity.com/InfoIssue/route/file/downloadfile/false/" + self
+					// 				.schoolData.photo
+					// 			self.richText = self.schoolData.particulars.replace(
+					// 				/&(lt|gt|nbsp|amp|quot;|quot);/ig,
+					// 				function(all, t) {
+					// 					return arrEntities[t];
+					// 				});
+					// 		}, null, null,
+					// 		function() {
+
+					// 		});
+					// },
+					getInfo: function() {
+						var self = this;
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/infocontent/getinfocontent/'+self.id, {},
+							null,
+							function(code, data) {
+								console.log(data)
+								self.title = data.info_content;
+								self.content=data.info_detail
+							}, null, null,
+							function() {
+					
+							});
+					},
+				},
+				mounted() {
+					// 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据
+					
+					this.id =unescape(this.getUrlParam('id'))
+					this.getInfo()
+
+				}
+			});
+		</script>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+		<title>创业培训申请</title>
+		<link rel="stylesheet" type="text/css" href="../css/moudle.css" />
+		<link rel="stylesheet" type="text/css" href="../css/vant.min.css" />
+		<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vant_min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/util.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/axios.min.js.js" type="text/javascript" charset="utf-8"></script>
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				height: 100%;
+				padding: 15px;
+			}
+
+			.van-calendar {
+				height: 98%;
+			}
+			.zjClass{
+				padding: 0 16px;
+			}
+			.zjClassList{
+				width: 100%;
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+				padding: 10px 0;
+			}
+			.zjClassLeft{
+				width: 5rem;
+				height: 5rem;
+				background: #fafafa;
+				border-radius: 10px;
+			}
+			.zjClassLeft img{
+				width: 100%;
+				height: 100%;
+			}
+
+			.zjClassRight{
+				width: 65%;
+			}
+			.zjClassRight p:first-child{
+				font-size: .4rem;
+				font-weight: bold;
+			}
+			.zjClassRight p:last-child{
+				font-size: .28rem;
+				line-height: 1rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="zjClass">
+				<div class="van-cell__title van-field__label">
+					<span>咨询专家</span>
+				</div>
+				<van-radio-group v-model="specialistId">
+					<van-radio v-for="(item,index) in zjList" :key="index" :name="item.specialistId" checked-color="#00ae7e">
+						<div class="zjClassList">
+							<div class="zjClassLeft">
+								<img :src="'https://www.yjhlcity.com/InfoIssue/route/file/downloadfile/true/'+item.specialistPhoto" alt="生效图片">
+							</div>
+							<div class="zjClassRight">
+								<p>{{item.specialistName}}</p>
+								<p>{{item.specialistIntroduction}}</p>
+							</div>
+						</div>
+					</van-radio>
+				</van-radio-group>
+			</div>
+
+			<van-field v-model="advisoryTitle" label="咨询标题" placeholder="请输入咨询标题"></van-field>
+			<van-field
+					v-model="advisoryContent"
+					rows="2"
+					autosize
+					label="咨询内容"
+					type="textarea"
+					placeholder="请输入咨询内容"
+					show-word-limit
+			></van-field>
+
+
+			<div style="margin: 16px;">
+				<van-button round block type="info" @click="onSubmit()" color="#00ae7e">提交</van-button>
+			</div>
+
+		</div>
+	</body>
+	<script>
+		let app = new Vue({
+			el: '#app',
+			data: {
+				advisoryTitle: '',
+				userId:'',
+				specialistId:"",
+				advisoryContent:"",
+
+				token : "",
+				zjList:[]
+			},
+			methods: {
+				//提交表单
+				onSubmit() {
+
+
+					let fromData = {
+						advisoryTitle: this.advisoryTitle,
+						userId:this.userId,
+						specialistId:this.specialistId,
+						advisoryContent:this.advisoryContent,
+					};
+					postJson(
+						'https://www.yjhlcity.com/InfoIssue/app/consult/saveconsult',
+						fromData, this.token,
+						function success(code, data) {
+							if (code == 200) {
+								layer.msg("提交成功")
+								//window.history.back()
+								setTimeout(()=>{
+									window.history.back()
+								},800)
+							} else {
+								layer.msg("提交失败，请重试")
+							}
+							console.log("提交成功返回数据" + code)
+							console.log(data)
+
+						},
+						function error(obj) {
+							layer.msg(obj.responseJSON.msg)
+						})
+
+
+				}
+			},
+			created() {
+				this.token = getUrlParam("token")
+				this.userId = getUrlParam("id")
+				let that = this
+				doGetFormToken(
+						'https://www.yjhlcity.com/InfoIssue/app/specialist/listspecialist',null,
+						getUrlParam("token"),
+						function(code, data) {
+							//console.log(data)
+							that.zjList = data
+
+						},
+						function() {
+
+						});
+			}
+		})
+	</script>
+</html>

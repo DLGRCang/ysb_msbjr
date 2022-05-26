@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>详情</title>
+		<link rel="stylesheet" href="../css/reset.css">
+		<link rel="stylesheet" href="../css/moudle.css">
+
+		<script src="../js/rem.js"></script>
+		<style>
+			.imgDiv{
+				width: 100%;
+				padding:0 .3em;
+				display: flex;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				box-sizing: border-box;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 95%;overflow:auto;background-color: #eaeaea;">
+			<div style="background-color: #ffffff;margin-bottom: .2rem;">
+				<div class="inf">
+					<p class="left">转让标题</p>
+					<p class="right">{{dataList.info_content}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">联系电话</p>
+					<p class="right">{{dataList.infoContactNumber}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">转让内容</p>
+					<p class="right">{{dataList.info_detail}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">描述</p>
+					<p class="right">{{dataList.contenttxt}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">审核状态</p>
+					<p class="right">{{dataList.status}}</p>
+				</div>
+
+
+				<div class="inf">
+					<p class="left">图片</p>
+
+				</div>
+				<div class="imgDiv">
+					<p style="width: 30%;margin-bottom: .4rem" v-for="(item,index) in dataList.img" :key="index"><img style="width: 100%" :src="'https://www.yjhlcity.com/InfoIssue/route/file/downloadfile/true/'+item" alt=""></p>
+				</div>
+
+			</div>
+		</div>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vue.js"></script>
+		<script src="../js/layer/layer.js"></script>
+		<script src="../js/layer/ajax.js"></script>
+		<script src="../js/util.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					dataList:[]
+				},
+				created: function(e) {
+
+					//URL_Request("id");
+					let that = this
+					doGetFormToken(
+							`https://www.yjhlcity.com/InfoIssue/app/infocontent/getinfocontent/${getUrlParam("id")}`,null,
+							getUrlParam("token"),
+							function(code, data) {
+								data.img = data.info_files.split(',')
+								//console.log(data)
+								that.dataList = data
+
+							},
+							function() {
+
+							});
+				},
+
+
+				
+			});
+		</script>

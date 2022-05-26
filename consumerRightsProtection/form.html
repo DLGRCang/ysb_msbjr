@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+		<title>消费维权申请</title>
+		<link rel="stylesheet" type="text/css" href="../css/moudle.css" />
+		<link rel="stylesheet" type="text/css" href="../css/vant.min.css" />
+		<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vant_min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/util.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/axios.min.js.js" type="text/javascript" charset="utf-8"></script>
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				height: 100%;
+				padding: 15px;
+			}
+
+			.van-calendar {
+				height: 98%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+
+			<van-field v-model="complainted" label="投诉对象" placeholder="请输入投诉对象"></van-field>
+			<van-field v-model="title" label="投诉标题" placeholder="请输入投诉标题"></van-field>
+			<van-field
+					v-model="details"
+					rows="2"
+					autosize
+					label="投诉内容"
+					type="textarea"
+					placeholder="请输入投诉内容"
+					show-word-limit
+			></van-field>
+			<van-cell-group>
+				<van-cell title="附件">
+					<van-uploader v-model="fileList" :file-list="fileList" :after-read="afterRead" max-count="1"></van-uploader>
+				</van-cell>
+			</van-cell-group>
+			<van-field v-model="address" label="投诉地点" placeholder="请输入投诉地点"></van-field>
+
+			<div style="margin: 16px;">
+				<van-button round block type="info" @click="onSubmit()" color="#00ae7e">提交</van-button>
+			</div>
+
+		</div>
+	</body>
+	<script>
+		let app = new Vue({
+			el: '#app',
+			data: {
+				complainted:'',
+				title:'',
+				details:'',
+				address:'',
+				fileList: [],
+				userId:'',
+				token : "",
+				type:null
+			},
+			methods: {
+				//提交表单
+				onSubmit() {
+					let fromData = {
+						complainted:this.complainted,
+						title:this.title,
+						details:this.details,
+						address:this.address,
+						files: this.fileList.length === 0 ? 'null':this.fileList[0].id,
+						userId:this.userId,
+						type:this.type
+					};
+					postJson(
+						'https://www.yjhlcity.com/InfoIssue/app/safeguardpotence/savesafeguardpotence',
+						fromData, this.token,
+						function success(code, data) {
+							if (code == 200) {
+								layer.msg("提交成功")
+								//window.history.back()
+								setTimeout(()=>{
+									window.history.back()
+								},800)
+							} else {
+								layer.msg("提交失败，请重试")
+							}
+							console.log("提交成功返回数据" + code)
+							console.log(data)
+
+						},
+						function error(obj) {
+							layer.msg(obj.responseJSON.msg)
+						})
+				},
+				afterRead(file) {
+					this.upload(file,true)
+				},
+
+				upload(file) {
+					let self = this
+					var formData = new FormData()
+					formData.append("image", file.file)
+					const config = {
+						headers: {
+							"Content-Type": "multipart/form-data",
+							"token": self.token
+						}
+					};
+					axios
+							.post("https://www.yjhlcity.com/InfoIssue/app/file/uploadimage",
+									formData, config)
+							.then(function(response) {
+								if(response.status === 200){
+									self.fileList[self.fileList.length - 1].id = response.data.data
+								}else {
+									layer.msg("图片上传失败")
+								}
+								layer.closeAll('loading');
+
+							})
+							.catch(function(error) {
+								console.log(error);
+							});
+				},
+
+			},
+			created() {
+				this.token = getUrlParam("token")
+				this.userId = getUrlParam("userId")
+				this.type = getUrlParam("type")
+			}
+		})
+	</script>
+</html>

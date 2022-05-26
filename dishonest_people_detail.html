@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>查询结果</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+
+		<script src="js/rem.js"></script>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%;overflow:auto;background-color: #eaeaea;">
+			<div v-if="data.length==0" style="width: 100%;height: 100%;display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="images/none.png" />
+			</div>
+
+			<div  v-else  v-for="(item, index) in data" style="background-color: #ffffff;margin-bottom: .2rem;">
+				<div class="inf">
+					<p class="left">姓名</p>
+					<p class="right">{{item.dishonestName}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">身份证号</p>
+					<p class="right">{{item.idCardNumber}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">案件编号</p>
+					<p class="right">{{item.dishonestNum}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">执行依据制作单位</p>
+					<p class="right">{{item.execute}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">被执行人类型</p>
+					<p class="right">{{item.personType}}</p>
+				</div>
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: .8rem;margin-top: .15rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					data:[]
+				},
+				created: function(e) {
+
+				},
+				methods: {
+					getUrlParam: function(name) {
+						var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+						var r = window.location.search.substr(1).match(reg); //匹配目标参数
+						if (r != null) return unescape(r[2]);
+						return null; //返回参数值
+					},
+					doGetInfo: function() {
+						var self = this;
+						// 判断卡号是否为空，为空返回
+						var name = unescape(self.getUrlParam("name"));
+						self.getInfo(name);
+					},
+					getInfo: function(name) {
+						var self = this;
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/dishonestpeople/listpagedishonestpeople?keywords=' +
+							name, {}, null,
+							function(code, data) {
+								self.data=data.rows
+							}, null, null,
+							function() {
+
+							});
+					},
+				},
+				mounted: function() {
+					this.doGetInfo()
+					
+				}
+				
+			});
+		</script>

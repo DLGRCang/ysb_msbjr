@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>家政服务</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+		<script src="js/rem.js"></script>
+		<style>
+			.cm-page-input {
+				background-color: #fff;
+				width: 80%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				margin: -15px auto;
+				display: flex;
+				flex-direction: column;
+				padding: 0.3rem;
+			}
+
+			.cm-page-type {
+				display: flex;
+			}
+
+			.cm-page-type input {
+				width: 100%;
+				height: .78rem;
+				border: 1px solid #EEEEEE;
+				outline: 0;
+				font-size: .3rem;
+				color: #333333;
+				padding: .18rem;
+				box-sizing: border-box;
+				margin-left: 0.2rem;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: auto;
+				margin-top: 0;
+				padding-top: 0;
+				display: flex;
+				align-items: flex-end;
+				/* margin-top: .6rem; */
+			}
+
+			.cm-page-btn button {
+				width: 100%;
+				height: 0.8rem;
+				background: #6670E1;
+				border-radius: 3px;
+				font-size: .3rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .8rem;
+				border: 0;
+				outline: none;
+			}
+
+			.info {
+				display: flex;
+			}
+
+			.info .right {
+				display: flex;
+				align-items: center;
+				height: auto;
+				float: right;
+				padding-right: .3rem;
+				font-size: .3rem;
+				margin: 5px 0;
+				line-height: .45rem;
+				color: #666666;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%; overflow:auto;background-color: white;">
+			<div class="Head" style="z-index: -99;">
+				<img src="./images/jiazhengfuwu.jpg" style="width: 100%;height: 100%;">
+			</div>
+
+			<div v-if="showList.length==0&&showList1.length==0&&showList2.length==0&&showList3.length==0&&showList4.length==0"
+				style="width: 100%;height: auto;margin-top: 50px; display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="images/none.png" />
+			</div>
+			<div v-else>
+				<div style="display: flex;margin: 10px;padding-left: 5px;padding-top: 15px;">
+					<p style="height: 18px;width: 5px;border-radius: 2px;background-color: #FFBE1A;margin-right: 5px;">
+					</p>
+					<p style="font-size: 18px;line-height: 18px;font-weight: bold;">搬家装修</p>
+				</div>
+				<div v-for="(item, index) in showList"
+					style="background-color: #ffffff;padding: 15px 0.3rem;border-bottom: #eaeaea 1px solid;"
+					@click="goInfo(item.infoContentId)">
+					<div class="info">
+						<p class="right">{{item.info_content}}</p>
+					</div>
+					<div class="info">
+						<p class="right">服务热线：<a style="color: #009F95;text-decoration: underline;font-size: .3rem;"  @click.stop="call(item.infoContactNumber)">{{item.infoContactNumber}}</a></p>
+					</div>
+				</div>
+
+				<div style="display: flex;margin: 10px;padding-left: 5px;padding-top: 15px;">
+					<p style="height: 18px;width: 5px;border-radius: 2px;background-color: #FFBE1A;margin-right: 5px;">
+					</p>
+					<p style="font-size: 18px;line-height: 18px;font-weight: bold;">保姆月嫂</p>
+				</div>
+				<div v-for="(item, index) in showList1"
+					style="background-color: #ffffff;padding: 15px 0.3rem;border-bottom: #eaeaea 1px solid;"
+					@click="goInfo(item.infoContentId)">
+					<div class="info">
+						<p class="right">{{item.info_content}}</p>
+					</div>
+					<div class="info">
+						<p class="right">服务热线：<a style="color: #009F95;text-decoration: underline;font-size: .3rem;"  @click.stop="call(item.infoContactNumber)">{{item.infoContactNumber}}</a></p>
+					</div>
+				</div>
+
+				<div style="display: flex;margin: 10px;padding-left: 5px;padding-top: 15px;">
+					<p style="height: 18px;width: 5px;border-radius: 2px;background-color: #FFBE1A;margin-right: 5px;">
+					</p>
+					<p style="font-size: 18px;line-height: 18px;font-weight: bold;">保洁疏通</p>
+				</div>
+				<div v-for="(item, index) in showList2"
+					style="background-color: #ffffff;padding: 15px 0.3rem;border-bottom: #eaeaea 1px solid;"
+					@click="goInfo(item.infoContentId)">
+					<div class="info">
+						<p class="right">{{item.info_content}}</p>
+					</div>
+					<div class="info">
+						<p class="right">服务热线：<a style="color: #009F95;text-decoration: underline;font-size: .3rem;"  @click.stop="call(item.infoContactNumber)">{{item.infoContactNumber}}</a></p>
+					</div>
+				</div>
+
+				<div style="display: flex;margin: 10px;padding-left: 5px;padding-top: 15px;">
+					<p style="height: 18px;width: 5px;border-radius: 2px;background-color: #FFBE1A;margin-right: 5px;">
+					</p>
+					<p style="font-size: 18px;line-height: 18px;font-weight: bold;">家电维修</p>
+				</div>
+				<div v-for="(item, index) in showList3"
+					style="background-color: #ffffff;padding: 15px 0.3rem;border-bottom: #eaeaea 1px solid;"
+					@click="goInfo(item.infoContentId)">
+					<div class="info">
+						<p class="right">{{item.info_content}}</p>
+					</div>
+					<div class="info">
+						<p class="right">服务热线：<a style="color: #009F95;text-decoration: underline;font-size: .3rem;"  @click.stop="call(item.infoContactNumber)">{{item.infoContactNumber}}</a></p>
+					</div>
+				</div>
+
+				<div style="display: flex;margin: 10px;padding-left: 5px;padding-top: 15px;">
+					<p style="height: 18px;width: 5px;border-radius: 2px;background-color: #FFBE1A;margin-right: 5px;">
+					</p>
+					<p style="font-size: 18px;line-height: 18px;font-weight: bold;">修锁换锁</p>
+				</div>
+				<div v-for="(item, index) in showList4"
+					style="background-color: #ffffff;padding: 15px 0.3rem;border-bottom: #eaeaea 1px solid;"
+					@click="goInfo(item.infoContentId)">
+					<div class="info">
+						<p class="right">{{item.info_content}}</p>
+					</div>
+					<div class="info">
+						<p class="right">服务热线：<a style="color: #009F95;text-decoration: underline;font-size: .3rem;"  @click.stop="call(item.infoContactNumber)">{{item.infoContactNumber}}</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .35rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: 0.8rem;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					showList: [],
+					showList1: [],
+					showList2: [],
+					showList3: [],
+					showList4: [],
+				},
+				created: function(e) {
+					this.name = localStorage.getItem('name') == null ? '' : localStorage.getItem('name')
+				},
+				methods: {
+					call(number) {
+						window.location.href = 'tel:' + number;
+					},
+					getInfo: function() {
+						var self = this;
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/infocontent/listUserpageinfocontent?infotypeid=b2ca93cd-80d8-46d8-a680-664b91215087', {},
+							null,
+							function(code, data) {
+								self.showList = data.rows;
+							}, null, null,
+							function() {
+
+							});
+
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/infocontent/listUserpageinfocontent?infotypeid=7d2945b5-77e3-41a2-b43f-6239911cf3ae', {},
+							null,
+							function(code, data) {
+								self.showList1 = data.rows;
+							}, null, null,
+							function() {
+
+							});
+
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/infocontent/listUserpageinfocontent?infotypeid=400f438d-68c5-420f-94e5-c59fc936cb36', {},
+							null,
+							function(code, data) {
+								self.showList2 = data.rows;
+							}, null, null,
+							function() {
+
+							});
+
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/infocontent/listUserpageinfocontent?infotypeid=c9165b43-bf54-45ec-bff1-feadac073e5b', {},
+							null,
+							function(code, data) {
+								self.showList3 = data.rows;
+							}, null, null,
+							function() {
+
+							});
+						doGetForm(
+							'https://www.yjhlcity.com/InfoIssue/app/release/infocontent/listUserpageinfocontent?infotypeid=81aadffd-b36d-41df-a54e-e0e60bfdab5b', {},
+							null,
+							function(code, data) {
+								self.showList4 = data.rows;
+							}, null, null,
+							function() {
+
+							});
+					},
+					goInfo(id) {
+						window.location.href = 'newsInfo.html?id=' + escape(id)
+					},
+					
+
+				},
+				mounted() {
+					// 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据
+					window.onbeforeunload = function(e) {
+						var storage = window.localStorage;
+						storage.clear()
+					}
+					this.getInfo()
+				}
+			});
+		</script>

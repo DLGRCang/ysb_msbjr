@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>详情</title>
+		<link rel="stylesheet" href="../css/reset.css">
+		<link rel="stylesheet" href="../css/moudle.css">
+
+		<script src="../js/rem.js"></script>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 95%;overflow:auto;background-color: #eaeaea;">
+			<div style="background-color: #ffffff;margin-bottom: .2rem;">
+				<div class="inf">
+					<p class="left">投诉对象</p>
+					<p class="right">{{dataList.complainted}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">投诉标题</p>
+					<p class="right">{{dataList.title}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">投诉内容</p>
+					<p class="right">{{dataList.details}}</p>
+				</div>
+
+				<div class="inf">
+					<p class="left">附件</p>
+					<p class="right"><img style="width: 2rem" :src="'https://www.yjhlcity.com/InfoIssue/route/file/downloadfile/true/'+dataList.files" alt=""></p>
+				</div>
+
+				<div class="inf">
+					<p class="left">投诉地点</p>
+					<p class="right">{{dataList.address}}</p>
+				</div>
+
+			</div>
+		</div>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vue.js"></script>
+		<script src="../js/layer/layer.js"></script>
+		<script src="../js/layer/ajax.js"></script>
+		<script src="../js/util.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					dataList:[]
+				},
+				created: function(e) {
+					//URL_Request("id");
+					let that = this
+					doGetFormToken(
+							`https://www.yjhlcity.com/InfoIssue/app/safeguardpotence/getsafeguardpotence/${getUrlParam("id")}`,null,
+							getUrlParam("token"),
+							function(code, data) {
+								//console.log(data)
+								that.dataList = data
+
+							},
+							function() {
+
+							});
+				},
+
+
+				
+			});
+		</script>

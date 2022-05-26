@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+		<title>一键挪车</title>
+		<link rel="stylesheet" type="text/css" href="css/moudle.css" />
+		<link rel="stylesheet" type="text/css" href="css/vant.min.css" />
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vant_min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/util.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.1/vconsole.min.js"></script>
+		<script src="js/axios.min.js.js" type="text/javascript" charset="utf-8"></script>
+
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				height: 100%;
+				padding: 15px;
+			}
+
+			.van-field__label {
+				-webkit-box-flex: 0;
+				-webkit-flex: none;
+				flex: none;
+				box-sizing: border-box;
+				width: 5.2em;
+				margin-right: 12px;
+				color: #646566;
+				text-align: left;
+				word-wrap: break-word;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+
+			<van-field v-model="address" label="地点"></van-field>
+
+			<van-field v-model="details" label="描述"></van-field>
+
+			<van-field v-model="license_plate_number" label="车牌号"></van-field>
+
+
+
+			<div class="van-cell van-field">
+				<div class="van-cell__title van-field__label">
+					<span>图片</span>
+				</div>
+				<van-uploader v-model="fileList" :after-read="afterRead" multiple :max-count="3">
+				</van-uploader>
+
+			</div>
+
+
+
+
+			<div style="margin: 16px;">
+				<van-button round block type="info" @click="onSubmit()" color="#00ae7e">提交</van-button>
+			</div>
+
+		</div>
+	</body>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data: {
+				token: 'N05lUTRRZThwZTVBeS9OdE5EMGdTSFdTOGhGNVMwalcwOFNMSEpjRTFkMG1ock1ITEJxY1AzbWljQy9idWhSK1BtbkFhRG4yeURBeXhLcTFPMGxyaEYrVVFEQk1pZlhPWHFxS0ROajJ4RGczOW9sL2V1YjdEWFFoNURHcHE4REQ5aGpyUFJqY3U2SDZWRXhJODBEeHpOTnN1TStvdWErY2ExekJ2UEhPVndjb0lxTzU1TVkyTlZPWW5Vb01ZY29CMms4Z0RpaEtTeDdOZkdDaDE4em1xTTV5ZDExREVHbWtVcHVpUWYxVDJleXhmYU1yQmtJbXZyb0EvOXNZZHVzK3hGVjlGUVhjL1F4T1lleklkL25zcWdPeVdlVmx4THoxSXM3TzYyNHZaMEtJS1pvQUQ3aVNpQXpRMVVrZlUrT3BVa0hWeVZpOGtRa05Ga0VWTFhvK0RzYVM0K3RidjZaMlZNTTI5UDdHTzZXeUVpalh6L2JPTU1vS0ZGZXU1eFBiVkpCSTBoNWJzSjlNSHcrdnNSdTNUSzZUWlNmb1RyQXM1Zkd4VFdvRDdXdz0==',
+				userId: '7597eca1-91a5-410d-8c98-6193ca20ffb8',
+				fileList: [],
+				address: '',
+				details: '',
+				license_plate_number: '',
+				files: [], //图片id
+
+			},
+			methods: {
+				//提交表单
+				onSubmit() {
+					this.files = []
+					for (let i = 0; i < this.fileList.length; i++) {
+						this.files.push(this.fileList[i].id)
+					}
+
+					let fromData = {
+						userId: this.userId,
+						auditStatus: 0,
+						files: this.files.toString(),
+						address: this.address,
+						details: this.details,
+						license_plate_number: this.license_plate_number,
+						report_data: changeDate(new Date)
+					};
+					postJson(
+						'https://www.yjhlcity.com/InfoIssue/app/release/movecar/savemovecar',
+						fromData, this.token,
+						function success(code, data) {
+							if (code == 200) {
+								layer.msg("提交成功")
+								window.history.back()
+							} else {
+								layer.msg("提交失败，请重试")
+							}
+							console.log("提交成功返回数据" + code)
+							console.log(data)
+
+						}, null, null,
+						function error(obj) {
+							console.log("提交失败返回数据")
+							console.log(obj)
+						})
+				},
+				afterRead(file) {
+
+					this.upload(file)
+				},
+				upload(file) {
+
+					let self = this
+					var formData = new FormData()
+					formData.append("image", file.file)
+					const config = {
+						headers: {
+							"Content-Type": "multipart/form-data",
+							"token": self.token
+						}
+					};
+
+					axios
+						.post("https://www.yjhlcity.com/InfoIssue/app/file/uploadimage",
+							formData, config)
+						.then(function(response) {
+							self.fileList[self.fileList.length - 1].id = response.data.data
+						})
+						.catch(function(error) {
+							console.log(error);
+						});
+				},
+				onConfirm(value, key) {
+					if (key == 'date') {
+						this[key] = changeDate(value);
+					} else {
+						this[key] = value;
+					}
+					this.showPicker = false;
+					this.showCalendar = false;
+
+				}
+
+			},
+			created() {
+				console.log(window.location.href)
+				var vConsole = new VConsole();
+				// this.token = getUrlParam("token")
+				// this.userId = getUrlParam("userId")
+
+			}
+		})
+	</script>
+</html>

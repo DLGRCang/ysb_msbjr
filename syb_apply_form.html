@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+		<title>创业培训申请</title>
+		<link rel="stylesheet" type="text/css" href="css/moudle.css" />
+		<link rel="stylesheet" type="text/css" href="css/vant.min.css" />
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vant_min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/util.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.1/vconsole.min.js"></script>
+
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				height: 100%;
+				padding: 15px;
+			}
+
+			.van-calendar {
+				height: 98%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+
+			<van-field v-model="name" label="姓名" readonly></van-field>
+			<div class="van-cell van-field">
+				<div class="van-cell__title van-field__label">
+					<span>性别</span>
+				</div>
+				<van-radio-group v-model="sex" direction="horizontal">
+					<van-radio name="男" checked-color="#00ae7e">男</van-radio>
+					<van-radio name="女" checked-color="#00ae7e">女</van-radio>
+				</van-radio-group>
+			</div>
+			</van-field>
+			<van-field v-model="area" label="家庭住址"></van-field>
+
+
+			<van-field v-model="nation" is-link readonly label="民族" placeholder="点击选择" @click="showPicker = true">
+			</van-field>
+			<van-popup v-model:show="showPicker" position="bottom">
+				<van-picker :columns="columns" @confirm="onConfirm($event,'nation')" @cancel="showPicker = false"
+					show-toolbar />
+			</van-popup>
+
+			<van-field v-model="date" is-link readonly label="出生日期" placeholder="点击选择" @click="showCalendar = true">
+			</van-field>
+			<van-calendar v-model:show="showCalendar" @confirm="onConfirm($event,'date')" :min-date="minDate"
+				:max-date="maxDate" color="#00ae7e"></van-calendar>
+
+			<van-field v-model="phone" label="联系电话" type="tel"></van-field>
+			<van-field v-model="culture" label="文化程度"></van-field>
+			<van-field v-model="cardNumber" label="身份证号" readonly></van-field>
+
+			<van-field v-model="type" label="人员类型"></van-field>
+			<van-field v-model="major" label="培训专业"></van-field>
+			<van-field v-model="place" label="培训地点"></van-field>
+			<van-field v-model="pxTime" label="培训时长"></van-field>
+			<van-field v-model="intention" label="就业意向"></van-field>
+
+
+
+
+			<div style="margin: 16px;">
+				<van-button round block type="info" @click="onSubmit()" color="#00ae7e">提交</van-button>
+			</div>
+
+		</div>
+	</body>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data: {
+				token: '',
+				idCard: '', // 身份证号
+				name: '', //姓名
+				area: '',
+				sex: '男',
+
+				nation: '',
+				showPicker: false,
+				columns: nations,
+
+				showCalendar: false,
+				date: '',
+				minDate: new Date(1920, 0, 1),
+				maxDate: new Date(),
+
+				phone: '',
+				culture: '',
+				cardNumber: '',
+				type: '',
+				major: '',
+				place: '',
+				pxTime: '',
+				intention: '',
+				subTime: changeDate(new Date)
+
+			},
+			methods: {
+				//提交表单
+				onSubmit() {
+					let fromData = {
+						application_id: 'd3e43335-515b-4c99-871f-eb3c25b1f5a1',
+						name: this.name,
+						sex: this.sex,
+						address: this.area,
+						national: this.nation,
+						birthdate: this.date,
+						phone: this.phone,
+						educationlevel: this.culture,
+						IDCard: this.cardNumber,
+						personneltype: this.type,
+						training_professional: this.major,
+						training_time: this.pxTime,
+						training_address: this.place,
+						Employment_intention: this.intention,
+						apply_time: this.subTime
+					};
+					postJson(
+						'https://www.yjhlcity.com/InfoIssue/app/release/applicationFormTable/saveApplicationFormTable',
+						fromData, this.token,
+						function success(code, data) {
+							if (code == 200) {
+								layer.msg("提交成功")
+								window.history.back()
+							} else {
+								layer.msg("提交失败，请重试")
+							}
+							console.log("提交成功返回数据" + code)
+							console.log(data)
+
+						}, null, null,
+						function error(obj) {
+							console.log("提交失败返回数据")
+							console.log(obj)
+						})
+				},
+				onConfirm(value, key) {
+					if (key == 'date') {
+						this[key] = changeDate(value);
+					} else {
+						this[key] = value;
+					}
+					this.showPicker = false;
+					this.showCalendar = false;
+
+				}
+
+			},
+			created() {
+				console.log(window.location.href)
+				var vConsole = new VConsole();
+				this.token = getUrlParam("token")
+				this.name = getUrlParam("name")
+				this.cardNumber = getUrlParam("idCard")
+
+			}
+		})
+	</script>
+</html>

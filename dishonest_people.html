@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>失信人员查询</title>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/moudle.css">
+
+		<script src="js/rem.js"></script>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 90%;">
+			<div class="Head" style="z-index: -99;">
+				<img src="./images/lishiwenhua.jpg" style="width: 100%;height: 100%;">
+			</div>
+			<div class="cm-page-input">
+				<div class="cm-page-text">失信人员查询</div>
+				<div class="cm-page-type" style="display:inline; ">
+					<input type="text" style="width:100%;" placeholder="请输入本人或他人身份证查询" v-model="name">
+				</div>
+				<div class="cm-page-btn">
+					<button @click="search(name)">查询</button>
+				</div>
+			</div>
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;margin-top: .35rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: eaeaea;text-align: center;background-color: #ffffff;line-height: 0.8rem;">
+			服务热线：0477-8969223
+		</div>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/layer/ajax.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+				},
+
+				methods: {
+					
+					search: function() {
+						var self = this;
+						// 判断卡号是否为空，为空返回
+						if (self.name == '' || self.name == null) {
+							layer.msg("身份证号不能为空");
+							return false;
+						} else {
+							window.location.href = 'dishonest_people_detail.html?name=' + escape(self.name.trim());
+						}
+						localStorage.setItem("name", self.name)
+					},
+					
+					getUserInfo(){
+						doGetForm(
+							'https://app.zwfw.nmg.gov.cn:4443/icity/auth2.0/authorize', {}, null,
+							function(code, data) {
+								console.log(data)
+							}, null, null,
+							function() {
+						
+							});
+						var url=encodeURI("https://www.yjhlcity.com/ysb_msbjr/dishonest_people1.html")
+						 window.location.href = '	https://app.zwfw.nmg.gov.cn:4443/icity/auth2.0/authorize?app_id=f0dac166-8244-4c8c-847e-4ee1a3988160&redirect_uri='+url+'&scope=auth_user&state=';
+					}
+
+				},
+
+				created: function(e) {
+					this.name = localStorage.getItem('name')
+				},
+
+				mounted() {
+					// 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据
+					window.onbeforeunload = function(e) {
+						var storage = window.localStorage;
+						storage.clear()
+					}
+					
+					this.getUserInfo()
+				}
+
+			});
+		</script>

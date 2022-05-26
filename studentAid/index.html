@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>学生资助</title>
+		<link rel="stylesheet" type="text/css" href="../css/vant.min.css" />
+		<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.1/vconsole.min.js"></script>
+		<script src="../js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vant_min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/rem.js"></script>
+		<script src="../js/util.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" href="../css/moudle.css">
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				background-color: #FFFFFF;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				background-color: #FFFFFF;
+				height: 90%;
+				display: flex;
+				flex-direction: column;
+				overflow: auto;
+			}
+
+			.cm-page-input {
+				background-color: #fff;
+				width: 85%;
+				border: 1px solid #eaeaea;
+				border-radius: .06rem;
+				display: flex;
+				align-items: center;
+				align-self: center;
+				padding: 0.3rem;
+				margin-top: .5rem;
+			}
+
+			.cm-page-btn {
+				width: 100%;
+				height: .7rem;
+				background: #00ae7e;
+				border-radius: 3px;
+				font-size: .28rem;
+				color: rgba(255, 255, 255, 1);
+				line-height: .4rem;
+				border: 0;
+				letter-spacing: 1.5px;
+				outline: none;
+			}
+
+			.tag {
+				font-size: .28rem;
+				color: black;
+				font-weight: bold;
+				margin: .8rem .55rem .2rem .55rem;
+			}
+
+			.list {
+				background-color: #eaeaea;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="cm-page-input">
+				<button class="cm-page-btn" @click="showPicker = true">资助申请</button>
+			</div>
+			<p class="tag">申请列表</p>
+			<div v-if="transferList.length==0"
+				 style="width: 100%;height: auto;margin-top: 100px; display: flex;align-items: center;justify-content: center;">
+				<img width="100px" height="auto" src="../images/none.png" />
+			</div>
+			<div v-else class="list">
+				<div v-for="(item,index) in transferList" :key="index" style="background-color: #ffffff;margin-bottom:.1rem;padding: 0 0.3rem;"
+					 @click="goInfo(item.studentSubsidizeId)">
+					<div class="inf">
+						<p class="left">学生姓名</p>
+						<p class="right">{{item.studentName}}</p>
+					</div>
+					<div class="inf">
+						<p class="left">学生类型</p>
+						<p class="right">{{item.applyType === '1' ? '幼儿小学':item.applyType === '2' ? '初高中':item.applyType === '3' ? '大学':''}}</p>
+					</div>
+				</div>
+			</div>
+			<van-popup v-model:show="showPicker" position="bottom" style="padding: .4rem">
+				<p style="font-size: .36rem;text-align: center">选择学生类型</p>
+				<div style="padding: .2rem"><van-button type="primary" block @click="goForm(1)">幼儿小学</van-button></div>
+				<div style="padding: .2rem"><van-button type="primary" block @click="goForm(2)">初高中</van-button></div>
+				<div style="padding: .2rem"><van-button type="primary" block @click="goForm(3)">大学</van-button></div>
+			</van-popup>
+		</div>
+		<div style="font-size: 10px;color: #eaeaea;text-align: center;margin-top: .3rem;">
+			数据来源：伊金霍洛旗大数据中心
+		</div>
+		<div style="font-size: 10px;color: #eaeaea;text-align: center;line-height: 0.5rem;">
+			服务热线：0477-8969223
+		</div>
+		<script type="text/javascript">
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					name: '', //姓名
+					idCard: '', // 身份证号
+					code: '', //授权成功返回的code
+					open_Id: '', //打开应用返回的openid
+					appId: 'c11bbc34-4597-427a-90f9-8645b6b30ed0',
+					transferList:[],
+					showPicker:false,
+					userId:'',
+					token : ""
+				},
+				methods: {
+					goInfo(id) {
+						window.location.href = 'detail.html?id=' + id + "&token=" + escape(this.token)
+					},
+
+					//进入表单提交页
+					goForm(applyType) {
+						window.location.href = 'form.html?id=' + this
+							.userId + "&token=" + escape(this.token) + "&applyType="+applyType +'&name='+escape(this.name) +'&idCard='+this.idCard;
+					},
+				},
+				created() {
+					//var vConsole = new VConsole();
+				},
+				mounted() {
+					let self = this
+					console.log(window.location.href)
+					this.code = getUrlParam("code")
+					this.open_Id = getUrlParam("open_id")
+
+					//如果没有授权则拉起授权，授权成功则请求后台获取用户信息
+					if (this.code == null) {
+						getUserInfo("./studentAid/index.html", this.appId)
+					} else {
+						console.log("获取用户信息")
+						getToken(this.code, this.open_Id, this.appId, function success(data) {
+							console.log(data)
+							self.token = data.result.data.token
+							self.name = data.result.data.userInfo.name
+							self.idCard = data.result.data.userInfo.idcard
+							self.userId = data.result.data.userInfo.id
+							doGetFormToken(
+									`https://www.yjhlcity.com/InfoIssue/app/studentsubsidize/liststudentsubsidize?userId=${self.userId}`,null,
+									self.token,
+									function(code, data) {
+										console.log(data)
+										self.transferList = data
+									},
+									function() {
+
+									});
+						})
+
+					}
+
+
+				}
+			})
+		</script>
+	</body>
+</html>

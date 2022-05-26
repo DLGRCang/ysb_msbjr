@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+		<title>转学申请</title>
+		<link rel="stylesheet" type="text/css" href="../css/moudle.css" />
+		<link rel="stylesheet" type="text/css" href="../css/vant.min.css" />
+		<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vant_min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/util.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/axios.min.js.js" type="text/javascript" charset="utf-8"></script>
+
+		<style>
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+				box-sizing: border-box;
+			}
+
+			#app {
+				height: 100%;
+				padding: 15px;
+			}
+
+			.van-calendar {
+				height: 98%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+
+			<van-field v-model="name" label="学生姓名" placeholder="请输入学生姓名"></van-field>
+			<div class="van-cell van-field">
+				<div class="van-cell__title van-field__label">
+					<span>性别</span>
+				</div>
+				<van-radio-group v-model="sex" direction="horizontal">
+					<van-radio name="男" checked-color="#00ae7e">男</van-radio>
+					<van-radio name="女" checked-color="#00ae7e">女</van-radio>
+				</van-radio-group>
+			</div>
+			</van-field>
+			<van-field v-model="nation" is-link readonly label="民族" placeholder="点击选择" @click="showPicker = true">
+			</van-field>
+			<van-popup v-model:show="showPicker" position="bottom">
+				<van-picker :columns="columns" @confirm="onConfirm($event,'nation')" @cancel="showPicker = false"
+							show-toolbar />
+			</van-popup>
+			<van-field v-model="idCard" label="身份证号" placeholder="请输入身份证号"></van-field>
+			<van-field v-model="currentAddress" label="现家庭住址" placeholder="请输入现家庭住址"></van-field>
+			<van-field v-model="domicilePlace" label="户籍所在地" placeholder="请输入户籍所在地"></van-field>
+			<van-field v-model="guardianName" label="监护人姓名" placeholder="请输入监护人姓名"></van-field>
+			<van-field v-model="guardianPhone" label="监护人联系电话" placeholder="请输入联系电话"></van-field>
+			<van-field v-model="guardianCompany" label="监护人工作单位" placeholder="请输入监护人工作单位"></van-field>
+			<van-cell-group>
+				<van-cell title="学生或监护人户口簿">
+					<van-uploader v-model="fileList" :file-list="fileList" :after-read="afterRead" max-count="1"></van-uploader>
+				</van-cell>
+				<van-cell title="监护人居住证明">
+					<van-uploader v-model="fileList1" :file-list="fileList1" :after-read="afterRead1" max-count="1"></van-uploader>
+				</van-cell>
+			</van-cell-group>
+
+<!--			<van-cell-group>-->
+<!--				<van-cell title-style="color:red" title="请选择居住证明类型">-->
+
+<!--				</van-cell>-->
+<!--				<div style="margin-left: 16px">-->
+<!--					<van-radio-group v-model="radio">-->
+<!--						<van-radio name="xsq">购房合同及缴款收据原件、复印件</van-radio>-->
+<!--						<van-radio name="hlsq">房产证原件、复印件</van-radio>-->
+<!--						<van-radio name="bbsq">旗外户籍租房提供居住证及近三个月水、电、燃气其中一项收据即可</van-radio>-->
+<!--						<van-radio name="bbsq1">旗内户籍租房提供社区居住证明及近三个月水、电、燃气其中一项收据即可</van-radio>-->
+<!--					</van-radio-group>-->
+<!--				</div>-->
+<!--			</van-cell-group>-->
+			<van-field v-model="transferReason" label="转学理由" placeholder="请输入转学理由"></van-field>
+			<van-field v-model="studentNumber" label="学籍号" placeholder="请输入学籍号"></van-field>
+			<van-field
+					readonly
+					clickable
+					label="学校"
+					:value="schoolInformationName"
+					placeholder="请选择"
+					@click="showPicker1 = true"
+			></van-field>
+			<van-popup v-model="showPicker1" round position="bottom">
+				<van-picker
+						show-toolbar
+						:columns="columns1"
+						@cancel="showPicker1 = false"
+						@confirm="onConfirm1"
+				/>
+			</van-popup>
+			<van-field
+					readonly
+					clickable
+					label="年级"
+					:value="grade"
+					placeholder="请选择"
+					@click="showPicker2 = true"
+			></van-field>
+			<van-popup v-model="showPicker2" round position="bottom">
+				<van-picker
+						show-toolbar
+						:columns="columns2"
+						@cancel="showPicker2 = false"
+						@confirm="onConfirm2"
+				/>
+			</van-popup>
+			<van-field v-model="originalSchoolPhone" label="原就读学校联系电话" placeholder="请输入联系电话"></van-field>
+			<van-field v-model="originalSchool" label="原就读学校" placeholder="请输入原就读学校"></van-field>
+
+			<div style="margin: 16px;">
+				<van-button round block type="info" @click="onSubmit()" color="#00ae7e">提交</van-button>
+			</div>
+
+		</div>
+	</body>
+	<script>
+		let app = new Vue({
+			el: '#app',
+			data: {
+				idCard: '', // 身份证号
+				name: '', //姓名
+				area: '',
+				sex: '男',
+
+				nation: '',
+				showPicker: false,
+				columns: nations,
+
+				showCalendar: false,
+				date: '',
+				minDate: new Date(1920, 0, 1),
+				maxDate: new Date(),
+
+				currentAddress:'',
+				domicilePlace:'',
+				guardianName:'',
+				guardianPhone:'',
+				guardianCompany:'',
+				transferReason:'',
+				studentNumber:'',
+				originalSchoolPhone:'',
+				originalSchool:'',
+
+				subTime: changeDate(new Date),
+				fileList: [],
+				fileList1: [],
+				radio: '',
+				schoolInformationName: '',
+				showPicker1: false,
+				columns1: [],
+				columns1Data:[],
+				grade: '',
+				showPicker2: false,
+				userId:'',
+				columns2:  ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '初一', '初二', '初三', '高一', '高二', '高三'],
+				token : "",
+
+			},
+			methods: {
+				//提交表单
+				onSubmit() {
+					let schoolInformationId = ''
+					for(let i in this.columns1Data){
+
+						if(this.columns1Data[i].schoolName === this.schoolInformationName){
+							schoolInformationId = this.columns1Data[i].schoolInformationId
+						}
+					}
+
+					let fromData = {
+						userId:this.userId,
+						userName: this.name,
+						sex: this.sex,
+						nation:this.nation,
+						idCard:this.idCard,
+						currentAddress:this.currentAddress,
+						domicilePlace:this.domicilePlace,
+						guardianName:this.guardianName,
+						guardianPhone:this.guardianPhone,
+						guardianCompany:this.guardianCompany,
+						photo:this.fileList[0] !== undefined ? this.fileList[0].id:undefined,
+						accessory:this.fileList1[0] !== undefined ? this.fileList1[0].id:undefined,
+						transferReason:this.transferReason,
+						studentNumber:this.studentNumber,
+						schoolInformationId:schoolInformationId,
+						originalSchoolPhone:this.originalSchoolPhone,
+						originalSchool:this.originalSchool,
+						grade:this.grade
+					};
+					postJson(
+						'https://www.yjhlcity.com/InfoIssue/app/transferschool/savetransferschool',
+						fromData, this.token,
+						function success(code, data) {
+							if (code == 200) {
+								layer.msg("提交成功")
+								//window.history.back()
+								setTimeout(()=>{
+									window.history.back()
+								},800)
+							} else {
+								layer.msg("提交失败，请重试")
+							}
+							console.log("提交成功返回数据" + code)
+							console.log(data)
+
+						},
+						function error(obj) {
+							layer.msg(obj.responseJSON.msg)
+						})
+
+
+				},
+				onConfirm(value, key) {
+					if (key == 'date') {
+						this[key] = changeDate(value);
+					} else {
+						this[key] = value;
+					}
+					this.showPicker = false;
+					this.showCalendar = false;
+
+				},
+				afterRead(file) {
+					layer.load(1);
+					this.upload(file,true)
+				},
+				afterRead1(file) {
+					layer.load(1);
+					//const { file } = event.detail;
+					this.upload(file,false)
+				},
+				upload(file,isTrue) {
+
+					let self = this
+					var formData = new FormData()
+					formData.append("image", file.file)
+					const config = {
+						headers: {
+							"Content-Type": "multipart/form-data",
+							"token": self.token
+						}
+					};
+
+					axios
+							.post("https://www.yjhlcity.com/InfoIssue/app/file/uploadimage",
+									formData, config)
+							.then(function(response) {
+								if(response.status === 200){
+									if(isTrue){
+										self.fileList[self.fileList.length - 1].id = response.data.data
+									}else {
+										self.fileList1[self.fileList1.length - 1].id = response.data.data
+									}
+
+								}else {
+									layer.msg("图片上传失败")
+								}
+								layer.closeAll('loading');
+
+							})
+							.catch(function(error) {
+								console.log(error);
+							});
+				},
+
+				onConfirm1(value) {
+					this.schoolInformationName = value;
+					this.showPicker1 = false;
+				},
+				onConfirm2(value) {
+					this.grade = value;
+					this.showPicker2 = false;
+				},
+
+			},
+			created() {
+
+				this.token = getUrlParam("token")
+				this.userId = getUrlParam("id")
+				this.name = getUrlParam("name")
+				this.idCard = getUrlParam("idCard")
+				let that = this
+				doGetFormToken(
+						'https://www.yjhlcity.com/InfoIssue/app/release/schoolinformation/listschoolinformation',null,
+						this.token,
+						function(code, data) {
+							that.columns1Data = data
+							for(let i in data){
+								that.columns1.push(data[i].schoolName)
+							}
+						},
+						function() {
+
+						});
+
+			}
+		})
+	</script>
+</html>

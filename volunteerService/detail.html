@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>详情</title>
+		<link rel="stylesheet" href="../css/reset.css">
+		<link rel="stylesheet" href="../css/moudle.css">
+
+		<script src="../js/rem.js"></script>
+	</head>
+	<body>
+		<div id="app" style="width: 100%; height: 100%;overflow:auto;background-color: #eaeaea;">
+			<div style="background-color: #ffffff;margin-bottom: .2rem;">
+				<div class="inf">
+					<p class="left">标题</p>
+					<p class="right">{{dataList.标题}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">时间</p>
+					<p class="right">{{dataList.时间}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">报名人数</p>
+					<p class="right">{{dataList.报名人数}}</p>
+				</div>
+				<div class="inf">
+					<p class="left">内容</p>
+					<p class="right">{{dataList.内容}}</p>
+				</div>
+
+				<div class="inf">
+					<p class="left">监护人居住证明</p>
+					<p class="right"><img style="width: 2rem" :src="'https://www.yjhlcity.com/InfoIssue/route/file/downloadfile/true/'+dataList.图片" alt=""></p>
+				</div>
+
+			</div>
+		</div>
+		<script src="../js/jquery-2.1.4.min.js"></script>
+		<script src="../js/vue.js"></script>
+		<script src="../js/layer/layer.js"></script>
+		<script src="../js/layer/ajax.js"></script>
+		<script src="../js/util.js"></script>
+		<script>
+			var nv = new Vue({
+				el: '#app',
+				data: {
+					name: '',
+					dataList:[]
+				},
+				created: function(e) {
+					//URL_Request("id");
+					let that = this
+					doGetFormToken(
+							`https://www.yjhlcity.com/InfoIssue/app/volunteersservice/getmapvolunteersservice/${getUrlParam("id")}`,null,
+							getUrlParam("token"),
+							function(code, data) {
+								//console.log(data)
+								that.dataList = data
+
+							},
+							function() {
+
+							});
+				},
+
+
+				
+			});
+		</script>
